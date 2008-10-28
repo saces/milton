@@ -7,12 +7,15 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class MiltonServlet extends AbstractMiltonEndPoint implements Servlet{
     
-    private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MiltonServlet.class);
+    private Logger log = LoggerFactory.getLogger(MiltonServlet.class);
     
-    ServletConfig config;
+    private ServletConfig config;
     
     private static final ThreadLocal<HttpServletRequest> originalRequest = new ThreadLocal<HttpServletRequest>();
     private static final ThreadLocal<HttpServletResponse> originalResponse = new ThreadLocal<HttpServletResponse>();
@@ -27,7 +30,6 @@ public class MiltonServlet extends AbstractMiltonEndPoint implements Servlet{
         }
     }
     
-    @Override
     public void init(ServletConfig config) throws ServletException {
         try {
             this.config = config;
@@ -43,7 +45,6 @@ public class MiltonServlet extends AbstractMiltonEndPoint implements Servlet{
         }        
     }
     
-    @Override
     public void service(javax.servlet.ServletRequest servletRequest, javax.servlet.ServletResponse servletResponse) throws ServletException, IOException {
         HttpServletRequest req = (HttpServletRequest) servletRequest;
         HttpServletResponse resp = (HttpServletResponse) servletResponse;
@@ -62,12 +63,10 @@ public class MiltonServlet extends AbstractMiltonEndPoint implements Servlet{
         }
     }
 
-    @Override
     public String getServletInfo() {
         return "MiltonServlet";
     }
 
-    @Override
     public ServletConfig getServletConfig() {
         return config;
     }    

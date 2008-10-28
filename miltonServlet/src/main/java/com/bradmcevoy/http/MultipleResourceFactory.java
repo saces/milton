@@ -1,24 +1,21 @@
 package com.bradmcevoy.http;
 
-import com.bradmcevoy.http.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class MultipleResourceFactory implements ResourceFactory, Initable {
     
-    private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MultipleResourceFactory.class);
+    private Logger log = LoggerFactory.getLogger(MultipleResourceFactory.class);
     
     private final List<ResourceFactory> factories = new ArrayList<ResourceFactory>();
     
-    public MultipleResourceFactory() {
-    }
-
-    @Override
     public Resource getResource(String host, String url) {
         for( ResourceFactory rf : factories ) {
             Resource r = rf.getResource(host,url);
             if( r != null ) {
-//                log.debug("got resource: " + r.getClass().getName() + " from resource factory: " + rf.getClass().getName());
                 return r;
             }
         }
@@ -26,7 +23,6 @@ public class MultipleResourceFactory implements ResourceFactory, Initable {
         return null;
     }
 
-    @Override
     public String getSupportedLevels() {
         String s = "1,2";
         for( ResourceFactory rf : factories ) {
@@ -35,10 +31,7 @@ public class MultipleResourceFactory implements ResourceFactory, Initable {
         }
         return s;
     }
-
     
-    
-    @Override
     public void init(ApplicationConfig config, HttpManager manager) {        
         String sFactories = config.getInitParameter("resource.factory.multiple");
         init(sFactories, config, manager);
@@ -77,9 +70,6 @@ public class MultipleResourceFactory implements ResourceFactory, Initable {
         factories.add(rf);
     }
 
-
-
-    @Override
     public void destroy(HttpManager manager) {
         if( factories == null ) {
             log.warn("factories is null");
@@ -90,6 +80,5 @@ public class MultipleResourceFactory implements ResourceFactory, Initable {
                 ((Initable)f).destroy(manager);
             }
         }
-    }
-    
+    }    
 }

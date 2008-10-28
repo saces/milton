@@ -1,6 +1,7 @@
 package com.bradmcevoy.http;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -10,9 +11,12 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class StaticResourceFilter implements Filter {
     
-    private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(StaticResourceFilter.class);
+    private Logger log = LoggerFactory.getLogger(StaticResourceFilter.class);
     
     private FilterConfig filterConfig = null;
     

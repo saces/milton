@@ -1,16 +1,16 @@
 package com.bradmcevoy.http;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ServletHttpManager extends HttpManager implements Initable {
     
-    private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ServletHttpManager.class);
+    private Logger log = LoggerFactory.getLogger(ServletHttpManager.class);
     
     public ServletHttpManager(ResourceFactory resourceFactory) {
         super(resourceFactory);
     }
     
-    
-    
-    @Override
     public void init(ApplicationConfig config,HttpManager manager) {
         log.debug("init");
         if( resourceFactory != null ) {
@@ -48,7 +48,6 @@ public class ServletHttpManager extends HttpManager implements Initable {
         }
     }
     
-    @Override
     public void destroy(HttpManager manager) {
         log.debug("destroy");
         if( resourceFactory != null ) {
@@ -58,7 +57,4 @@ public class ServletHttpManager extends HttpManager implements Initable {
             }
         }
     }
-    
-    
-    
 }

@@ -2,18 +2,17 @@ package com.bradmcevoy.http;
 
 import javax.servlet.ServletException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /** Base class for both MiltonServlet and MiltonFilter
  */
 public class AbstractMiltonEndPoint {
     
-    private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AbstractMiltonEndPoint.class);
+    private Logger log = LoggerFactory.getLogger(AbstractMiltonEndPoint.class);
     
-    ServletHttpManager httpManager;
+    protected ServletHttpManager httpManager;
     
-    public AbstractMiltonEndPoint() {
-    }
-    
-
     protected void init(String resourceFactoryClassName) throws ServletException {
         log.debug("resourceFactoryClassName: " + resourceFactoryClassName);
         ResourceFactory rf;
@@ -31,7 +30,4 @@ public class AbstractMiltonEndPoint {
         if( httpManager == null ) return ;
         httpManager.destroy(httpManager);
     }
-
- 
-    
 }

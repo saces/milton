@@ -10,6 +10,8 @@ import org.apache.commons.fileupload.FileItem;
 
 public class FileItemExt implements DataSource, FileItem {
     
+    private static final long serialVersionUID = 1L;
+    
     private final FileItem item;
     
     public FileItemExt(FileItem item) {

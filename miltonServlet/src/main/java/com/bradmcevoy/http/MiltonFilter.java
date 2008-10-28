@@ -22,19 +22,12 @@ import javax.servlet.http.HttpServletResponse;
  *  and resource factory isntances
  */
 public class MiltonFilter extends AbstractMiltonEndPoint implements Filter {
-    private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MiltonServlet.class);
-    
-    private FilterConfig config = null;
-    
     
     public void init(FilterConfig config) throws ServletException {
-        this.config = config;
         String resourceFactoryClassName = config.getInitParameter("resource.factory.class");
         init(resourceFactoryClassName);
         httpManager.init(new ApplicationConfig(config),httpManager);        
     }
-    
-
 
     public void doFilter(javax.servlet.ServletRequest servletRequest, javax.servlet.ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) servletRequest;
@@ -43,7 +36,4 @@ public class MiltonFilter extends AbstractMiltonEndPoint implements Filter {
         Response response = new ServletResponse(resp);
         httpManager.process(request, response);
     }
-
-
-    
 }

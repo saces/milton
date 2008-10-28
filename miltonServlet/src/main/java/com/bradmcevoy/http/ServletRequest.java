@@ -1,8 +1,5 @@
 package com.bradmcevoy.http;
 
-import com.bradmcevoy.http.Response.ContentType;
-import com.bradmcevoy.http.upload.MonitoredDiskFileItemFactory;
-import com.bradmcevoy.http.upload.UploadListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -11,21 +8,25 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
+import com.bradmcevoy.http.Response.ContentType;
+import com.bradmcevoy.http.upload.MonitoredDiskFileItemFactory;
+import com.bradmcevoy.http.upload.UploadListener;
+
 public class ServletRequest extends AbstractRequest { 
     
-    private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ServletRequest.class);
+    private final HttpServletRequest request;
     
-    final HttpServletRequest r;
-    
-    final Request.Method method;
+    private final Request.Method method;
 
-    final String url;
+    private final String url;
     
     private Auth auth;
     
@@ -48,7 +49,7 @@ public class ServletRequest extends AbstractRequest {
     }
     
     public ServletRequest(HttpServletRequest r) {
-        this.r = r;
+        this.request = r;
         String sMethod = r.getMethod();        
         method = Request.Method.valueOf(sMethod);
         url = r.getRequestURL().toString(); //MiltonUtils.stripContext(r);
@@ -56,31 +57,27 @@ public class ServletRequest extends AbstractRequest {
     }
 
     public HttpSession getSession() {
-        return r.getSession();
+        return request.getSession();
     }
 
-    @Override
     public String getFromAddress() {
-        return r.getRemoteHost();
+        return request.getRemoteHost();
     }
     
     
     @Override
     protected String getRequestHeader(Request.Header header) {
-        return r.getHeader(header.code);
+        return request.getHeader(header.code);
     }
 
-    @Override
     public Request.Method getMethod() {
         return method;
     }
 
-    @Override
     public String getAbsoluteUrl() {
         return url;
     }
 
-    @Override
     public Auth getAuthorization() {
         if( auth != null ) return auth;
         String enc = getRequestHeader( Request.Header.AUTHORIZATION );
@@ -89,24 +86,18 @@ public class ServletRequest extends AbstractRequest {
         auth = new Auth(enc);
         return auth;
     }    
-
     
-    
-    @Override
     public InputStream getInputStream() throws IOException {
-        return r.getInputStream();
+        return request.getInputStream();
     }    
-    
-    
-    
-    @Override
+
     public void parseRequestParameters(Map<String,String> params, Map<String,com.bradmcevoy.http.FileItem> files) throws RequestParseException {
         try {
             if( isMultiPart() ) {
                 UploadListener listener = new UploadListener();
                 MonitoredDiskFileItemFactory factory = new MonitoredDiskFileItemFactory(listener);
                 ServletFileUpload upload = new ServletFileUpload(factory);
-                List items = upload.parseRequest(this.r);
+                List items = upload.parseRequest(request);
                 
                 parseQueryString(params);
                 
@@ -119,9 +110,9 @@ public class ServletRequest extends AbstractRequest {
                     }
                 }
             } else {
-                for( Enumeration en = r.getParameterNames(); en.hasMoreElements();  ) {
+                for( Enumeration en = request.getParameterNames(); en.hasMoreElements();  ) {
                     String nm = (String)en.nextElement();
-                    String val = r.getParameter(nm);
+                    String val = request.getParameter(nm);
                     params.put(nm,val);
                 }
             }
@@ -133,7 +124,7 @@ public class ServletRequest extends AbstractRequest {
     }
     
     private void parseQueryString(Map<String,String> map) {
-        String qs = r.getQueryString();
+        String qs = request.getQueryString();
         parseQueryString(map,qs);
     }
     
@@ -157,7 +148,7 @@ public class ServletRequest extends AbstractRequest {
     }
     
     protected Response.ContentType getRequestContentType() {
-        String s = r.getContentType();
+        String s = request.getContentType();
         if( s == null ) return null;
         if( s.contains(Response.MULTIPART) ) return ContentType.MULTIPART;
         return typeContents.get(s);        

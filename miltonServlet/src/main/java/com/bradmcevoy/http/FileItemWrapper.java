@@ -31,17 +31,14 @@ public class FileItemWrapper implements com.bradmcevoy.http.FileItem{
         name = fixIEFileName(wrapped.getName());
     }        
     
-    @Override
     public String getContentType() {
         return wrapped.getContentType();
     }
 
-    @Override
     public String getFieldName() {
         return wrapped.getFieldName();
     }
 
-    @Override
     public InputStream getInputStream() {
         try {
             return wrapped.getInputStream();
@@ -50,7 +47,6 @@ public class FileItemWrapper implements com.bradmcevoy.http.FileItem{
         }
     }
 
-    @Override
     public OutputStream getOutputStream() {
         try {
             return wrapped.getOutputStream();
@@ -59,17 +55,11 @@ public class FileItemWrapper implements com.bradmcevoy.http.FileItem{
         }
     }
     
-    
-
-    @Override
     public String getName() {
         return name;
     }
 
-    @Override
     public long getSize() {
         return wrapped.getSize();
     }
-
-    
 }

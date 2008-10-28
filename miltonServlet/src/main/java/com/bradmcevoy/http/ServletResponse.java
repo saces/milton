@@ -8,8 +8,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 public class ServletResponse extends AbstractResponse {
-    
-    private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ServletResponse.class);
 
     private static ThreadLocal<HttpServletResponse> tlResponse = new ThreadLocal<HttpServletResponse>();
     
@@ -28,38 +26,30 @@ public class ServletResponse extends AbstractResponse {
         tlResponse.set(r);
     }
 
-    @Override
     public String getNonStandardHeader(String code) {
         return headers.get(code);
     }
-
     
-    @Override
     public void setNonStandardHeader(String name, String value) {
         r.addHeader(name,value);
         headers.put(name, value);
     }
-    
-    @Override
+
     public void setStatus(Response.Status status) {
         r.setStatus(status.code);
         this.status = status;
     }
 
-    @Override
     public Response.Status getStatus() {
         return status;
     }
-    
     
     @Override
     public void setContentLengthHeader(Long totalLength) {
         contentLength = totalLength;
         super.setContentLengthHeader(totalLength);
     }
-
-
-    @Override
+    
     public OutputStream getOutputStream() {        
         return out;
     }
