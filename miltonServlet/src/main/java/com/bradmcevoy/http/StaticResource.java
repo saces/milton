@@ -8,7 +8,7 @@ import java.io.OutputStream;
 import java.util.Date;
 import java.util.Map;
 
-import eu.medsea.util.MimeUtil;
+//import eu.medsea.util.MimeUtil;
 
 
 /**
@@ -19,10 +19,12 @@ import eu.medsea.util.MimeUtil;
 public class StaticResource implements GetableResource {
     
     private final File file;
+    private String contentType;
     
-    public StaticResource(File file, String url) {
+    public StaticResource(File file, String url, String contentType) {
         if( file.isDirectory() ) throw new IllegalArgumentException("Static resource must be a file, this is a directory: " + file.getAbsolutePath());
         this.file = file;
+        this.contentType = contentType;
     }
 
     public String getUniqueId() {
@@ -70,9 +72,11 @@ public class StaticResource implements GetableResource {
     }
 
     public String getContentType(String accepts) {
-        String s = MimeUtil.getMimeType(file.getAbsolutePath());
-        s = MimeUtil.getPreferedMimeType(accepts,s);
-        return s;
+//        String s = MimeUtil.getMimeType(file.getAbsolutePath());
+//        s = MimeUtil.getPreferedMimeType(accepts,s);
+//        return s;
+        
+        return null;
     }
 
     public String checkRedirect(Request request) {

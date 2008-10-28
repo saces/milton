@@ -17,7 +17,8 @@ public class StaticResourceFactory implements ResourceFactory, Initable{
         path = config.servletContext.getRealPath(path);
         File file = new File(path);
         if( file.exists() && !file.isDirectory() ) {
-            return new StaticResource(file,url);
+            String contentType = MiltonUtils.getContentType(config.servletContext, file.getName());
+            return new StaticResource(file,url, contentType);
         } else {
             return null;
         }

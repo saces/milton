@@ -8,7 +8,7 @@
 	<artifactId>milton-servlet</artifactId>
 	<version>1.1</version>
 	<packaging>jar</packaging>
-	<name>Milton WebDav Library</name>
+	<name>Milton WebDav Servlet Library</name>
 	<url>http://maven.apache.org</url>
 	<build>
 		<plugins>
@@ -59,11 +59,6 @@
 			<groupId>com.ettrema</groupId>
 			<artifactId>milton</artifactId>
 			<version>1.1</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.medsea</groupId>
-			<artifactId>mime-util</artifactId>
-			<version>1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-fileupload</groupId>
