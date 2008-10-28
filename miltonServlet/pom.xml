@@ -10,6 +10,9 @@
 	<packaging>jar</packaging>
 	<name>Milton WebDav Servlet Library</name>
 	<url>http://maven.apache.org</url>
+	<scm>
+		<connection>scm:svn:svn://www.ettrema.com/milton/trunk/miltonServlet</connection>
+	</scm>
 	<build>
 		<plugins>
 			<plugin>
