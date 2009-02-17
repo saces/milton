@@ -7,7 +7,7 @@
 	<name>Milton WebDav Library</name>
 	<url>http://milton.ettrema.com</url>
 	<scm>
-		<connection>scm:svn:svn://www.ettrema.com/milton/tags/milton-1.3</connection>
+		<connection>scm:svn:svn://www.ettrema.com/milton/tags/milton-1.3b</connection>
 	</scm>
 	<developers>
 		<developer>
