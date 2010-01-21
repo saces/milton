@@ -7,12 +7,11 @@
         <version>1.5.0.1-SNAPSHOT</version>
     </parent>
     <groupId>com.ettrema</groupId>
-    <artifactId>milton-filesystem-test</artifactId>
+    <artifactId>milton-caldav-demo</artifactId>
     <packaging>war</packaging>
-    <name>Milton FileSystem Demo</name>
+    <name>Milton CALDAV Demo</name>
     <description>Configuration only (no java sources) web application which shows how to use milton's
-    file system implementation of the milton API. It also shows how to configure
-    milton using spring.</description>
+    CALDAV and ACL support.</description>
     <build>
         <plugins>
             <plugin>
@@ -48,12 +47,7 @@
         </dependency>
         <dependency>
             <groupId>com.ettrema</groupId>
-            <artifactId>milton-ftp</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.ettrema</groupId>
-            <artifactId>milton-console</artifactId>
+            <artifactId>milton-caldav</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
