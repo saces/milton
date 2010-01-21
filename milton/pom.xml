@@ -43,6 +43,8 @@
         <module>milton-filesystem-test</module>
         <module>milton-ftp</module>
         <module>milton-ajax-demo</module>
+        <module>milton-caldav</module>
+        <module>milton-caldav-demo</module>
     </modules>
     <build>
         <plugins>

@@ -3,54 +3,9 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
            
-    <bean id="milton.resource.factory" class="com.ettrema.console.ConsoleResourceFactory">
-        <constructor-arg ref="filesystem.resource.factory" />
-        <constructor-arg value="/webdav-fs/console" />
-        <constructor-arg value="/webdav-fs" /> <!-- resource to test authentication against = host root -->
-        <constructor-arg>
-            <list>
-                <bean class="com.ettrema.console.LsFactory" />
-                <bean class="com.ettrema.console.CdFactory" />
-                <bean class="com.ettrema.console.RmFactory" />
-                <bean class="com.ettrema.console.HelpFactory" />
-                <bean class="com.ettrema.console.CpFactory" />
-                <bean class="com.ettrema.console.MkFactory" />
-                <bean class="com.ettrema.console.MkdirFactory" />
-            </list>
-        </constructor-arg>
-        <constructor-arg value="webdav-fs"/> <!-- the web context path -->
-    </bean>
 
-    <bean id="filesystem.resource.factory" class="com.ettrema.http.fs.FileSystemResourceFactory">
-        <property name="securityManager" ref="milton.fs.security.manager" />
-        <property name="lockManager" ref="milton.fs.lock.manager" />
-        <property name="maxAgeSeconds" value="3600" />
-        <property name="contextPath" value="webdav-fs"/>
-        <!-- the default root is System property user.home  -->
-        <!-- enable the property below to set the root elsewhere -->
-        <!--
-        <property name="root" value="/www/webs" />
-        -->
+    <bean id="caldav.demo.resource.factory" class="com.ettrema.http.caldav.demo.TResourceFactory">
     </bean>
-
-<!--
-    <bean id="milton.fs.security.manager" class="com.ettrema.http.fs.NullSecurityManager" >
-        <property name="realm" value="aRealm" />
-    </bean>
--->
-
-    <bean id="milton.fs.security.manager" class="com.ettrema.http.fs.SimpleSecurityManager" >
-        <property name="realm" value="aRealm" />
-        <property name="nameAndPasswords">
-            <map>
-                <entry key="me" value="pwd"/>
-                <entry key="user1" value="pwd1"/>
-                <entry key="user2" value="pwd2"/>
-            </map>
-        </property>
-    </bean>
-
-    <bean id="milton.fs.lock.manager" class="com.ettrema.http.fs.MemoryLockManager" />
 
     <bean id="auth.service" class="com.bradmcevoy.http.AuthenticationService"/>
 <!--
@@ -70,7 +25,7 @@
 
 
     <bean id="milton.http.manager" class="com.bradmcevoy.http.HttpManager">
-        <constructor-arg ref="milton.resource.factory" />
+        <constructor-arg ref="caldav.demo.resource.factory" />
         <constructor-arg ref="milton.response.handler.compressing" />
         <constructor-arg ref="auth.service" />
 
@@ -91,21 +46,4 @@
         <constructor-arg value="/test"/>
         -->
     </bean>
-
-    <!-- Adapts the specified milton security manager to the FTP server -->
-    <bean id="ftp.user.manager" class="com.ettrema.ftp.UserManagerAdapter">
-        <constructor-arg ref="filesystem.resource.factory"/>
-        <constructor-arg ref="milton.fs.security.manager"/>
-    </bean>
-
-    <!-- This server will provide access to the same resources available on webdav
-    via FTP
-    The FTP server will auto start on port 2121
-    -->
-    <bean id="ftp.server" class="com.ettrema.ftp.MiltonFtpAdapter" destroy-method="close">
-        <constructor-arg ref="filesystem.resource.factory"/>
-        <constructor-arg ref="ftp.user.manager"/>
-        <constructor-arg value="2121" />
-    </bean>
-
 </beans>

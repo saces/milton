@@ -9,7 +9,7 @@
     <groupId>com.ettrema</groupId>
     <artifactId>milton-caldav</artifactId>
     <packaging>jar</packaging>
-    <name>Milton Ftp</name>
+    <name>Milton Caldav</name>
     <build>
     </build>
     <dependencies>

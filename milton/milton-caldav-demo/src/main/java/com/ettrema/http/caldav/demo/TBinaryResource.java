@@ -1,5 +1,8 @@
-package com.bradmcevoy.http;
+package com.ettrema.http.caldav.demo;
 
+import com.bradmcevoy.http.CustomProperty;
+import com.bradmcevoy.http.CustomPropertyResource;
+import com.bradmcevoy.http.Range;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;

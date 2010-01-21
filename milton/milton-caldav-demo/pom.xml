@@ -25,7 +25,7 @@
                         </connector>
                     </connectors>
 
-                    <contextPath>/webdav-fs</contextPath>
+                    <contextPath>/webdav-caldav</contextPath>
 #
                     <stopKey>stop</stopKey>
 #
@@ -48,11 +48,6 @@
         <dependency>
             <groupId>com.ettrema</groupId>
             <artifactId>milton-caldav</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.ettrema</groupId>
-            <artifactId>milton-filesystem</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
