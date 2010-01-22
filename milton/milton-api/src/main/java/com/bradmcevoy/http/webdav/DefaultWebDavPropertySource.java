@@ -8,7 +8,6 @@ import com.bradmcevoy.http.LockToken;
 import com.bradmcevoy.http.LockableResource;
 import com.bradmcevoy.http.PropFindableResource;
 import com.bradmcevoy.http.PutableResource;
-import com.bradmcevoy.http.QuotaResource;
 import com.bradmcevoy.http.Resource;
 import com.bradmcevoy.http.Utils;
 import com.bradmcevoy.http.XmlWriter;
@@ -22,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.xml.namespace.QName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -29,17 +30,21 @@ import javax.xml.namespace.QName;
  */
 public class DefaultWebDavPropertySource implements PropertySource {
 
+    private static final Logger log = LoggerFactory.getLogger( DefaultWebDavPropertySource.class );
     private final Map<String, StandardProperty> writersMap = new HashMap<String, StandardProperty>();
     private final ResourceTypeHelper resourceTypeHelper;
     private final QuotaDataAccessor quotaDataAccessor;
 
     public DefaultWebDavPropertySource( ResourceTypeHelper resourceTypeHelper ) {
-        this(resourceTypeHelper, new DefaultQuotaDataAccessor());
+        this( resourceTypeHelper, new DefaultQuotaDataAccessor() );
     }
 
-    public DefaultWebDavPropertySource(ResourceTypeHelper resourceTypeHelper, QuotaDataAccessor quotaDataAccessor) {
+    public DefaultWebDavPropertySource( ResourceTypeHelper resourceTypeHelper, QuotaDataAccessor quotaDataAccessor ) {
         this.resourceTypeHelper = resourceTypeHelper;
-        this.quotaDataAccessor = new DefaultQuotaDataAccessor();
+        this.quotaDataAccessor = quotaDataAccessor;
+        log.info( "DefaultWebDavPropertySource: resourceTypeHelper: " + resourceTypeHelper.getClass());
+        log.info( "DefaultWebDavPropertySource: quotaDataAccessor: " + quotaDataAccessor.getClass());
+        Thread.dumpStack();
         add( new ContentLengthPropertyWriter() );
         add( new ContentTypePropertyWriter() );
         add( new CreationDatePropertyWriter() );
@@ -61,8 +66,9 @@ public class DefaultWebDavPropertySource implements PropertySource {
     }
 
     public Object getProperty( QName name, Resource r ) {
-        if( !name.getNamespaceURI().equals( WebDavProtocol.NS_DAV ) )
+        if( !name.getNamespaceURI().equals( WebDavProtocol.NS_DAV ) ) {
             return null;
+        }
         StandardProperty pa = writersMap.get( name.getLocalPart() );
         if( pa == null ) return null;
         if( r instanceof PropFindableResource ) {
@@ -130,7 +136,7 @@ public class DefaultWebDavPropertySource implements PropertySource {
 
         public Class<String> getValueClass() {
             return String.class;
-        }        
+        }
     }
 
     class LastModifiedDatePropertyWriter implements StandardProperty<Date> {
@@ -170,6 +176,7 @@ public class DefaultWebDavPropertySource implements PropertySource {
     class ResourceTypePropertyWriter implements StandardProperty<List<QName>> {
 
         public List<QName> getValue( PropFindableResource res ) {
+            log.trace( "ResourceTypePropertyWriter:getValue" );
             return resourceTypeHelper.getResourceTypes( res );
         }
 
@@ -180,8 +187,6 @@ public class DefaultWebDavPropertySource implements PropertySource {
         public Class getValueClass() {
             return List.class;
         }
-
-
     }
 
     class ContentTypePropertyWriter implements StandardProperty<String> {
@@ -235,7 +240,6 @@ public class DefaultWebDavPropertySource implements PropertySource {
         }
     }
 
-
     class QuotaUsedBytesPropertyWriter implements StandardProperty<Long> {
 
         public void append( XmlWriter xmlWriter, PropFindableResource res, String href ) {
@@ -256,7 +260,6 @@ public class DefaultWebDavPropertySource implements PropertySource {
         }
     }
 
-
     class QuotaAvailableBytesPropertyWriter implements StandardProperty<Long> {
 
         public void append( XmlWriter xmlWriter, PropFindableResource res, String href ) {
@@ -276,8 +279,6 @@ public class DefaultWebDavPropertySource implements PropertySource {
             return Long.class;
         }
     }
-
-
 
     class EtagPropertyWriter implements StandardProperty<String> {
 
@@ -363,8 +364,6 @@ public class DefaultWebDavPropertySource implements PropertySource {
         public Class getValueClass() {
             return Boolean.class;
         }
-
-
     }
 
     class MSIsReadOnlyPropertyWriter implements StandardProperty<Boolean> {
@@ -381,7 +380,6 @@ public class DefaultWebDavPropertySource implements PropertySource {
         public Class getValueClass() {
             return Boolean.class;
         }
-
     }
 
     private String nameEncode( String s ) {

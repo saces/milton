@@ -7,15 +7,15 @@
 
 
     <bean name="/miltonController" class="com.bradmcevoy.http.MiltonController">
-        <constructor-arg ref="milton.http.manager" />
+        <constructor-arg ref="http.manager" />
     </bean>
 
     <bean name="/*" class="com.bradmcevoy.http.MiltonController">
-        <constructor-arg ref="milton.http.manager" />
+        <constructor-arg ref="http.manager" />
     </bean>
 
     <bean name="*" class="com.bradmcevoy.http.MiltonController">
-        <constructor-arg ref="milton.http.manager" />
+        <constructor-arg ref="http.manager" />
     </bean>
 
     <bean id="urlMapping" class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping">

@@ -7,31 +7,76 @@
     <bean id="caldav.demo.resource.factory" class="com.ettrema.http.caldav.demo.TResourceFactory">
     </bean>
 
+    <bean id="resource.type.helper.default" class="com.bradmcevoy.http.webdav.WebDavResourceTypeHelper"/>
+
+    <bean id="resource.type.helper.acl" class="com.ettrema.http.acl.AccessControlledResourceTypeHelper">
+        <constructor-arg ref="resource.type.helper.default"/>
+    </bean>
+
+    <bean id="resource.type.helper.caldav" class="com.ettrema.http.caldav.CalendarResourceTypeHelper">
+        <constructor-arg ref="resource.type.helper.acl"/>
+    </bean>
+
     <bean id="auth.service" class="com.bradmcevoy.http.AuthenticationService"/>
 <!--
-    <bean id="milton.response.handler" class="com.bradmcevoy.http.MsOfficeResponseHandler"/>
+    <bean id="response.handler" class="com.bradmcevoy.http.MsOfficeResponseHandler"/>
 -->
 
-    <bean id="milton.response.handler" class="com.bradmcevoy.http.webdav.DefaultWebDavResponseHandler">
+    <bean id="handler.helper" class="com.bradmcevoy.http.HandlerHelper">
         <constructor-arg ref="auth.service"/>
+        <constructor-arg>
+            <list>
+                <!-- Storage quota checkers-->
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="response.handler" class="com.bradmcevoy.http.webdav.DefaultWebDavResponseHandler">
+        <constructor-arg ref="auth.service"/>
+        <constructor-arg ref="resource.type.helper.caldav"/>
     </bean>
 
     <!-- The compressing response handler wraps the default response handler and compresses
     response content. This will only actually perform compression for specific mime types
     (currently hard coded to text, css and js files) and if the client supports gzip -->
-    <bean id="milton.response.handler.compressing" class="com.bradmcevoy.http.CompressingResponseHandler">
-        <constructor-arg ref="milton.response.handler" />
+    <bean id="response.handler.compressing" class="com.bradmcevoy.http.CompressingResponseHandler">
+        <constructor-arg ref="response.handler" />
     </bean>
 
+    <bean id="protocol.http11" class="com.bradmcevoy.http.http11.Http11Protocol">
+        <constructor-arg ref="response.handler.compressing"/>
+        <constructor-arg ref="handler.helper"/>
+    </bean>
 
-    <bean id="milton.http.manager" class="com.bradmcevoy.http.HttpManager">
+    <bean id="protocol.webdav" class="com.bradmcevoy.http.webdav.WebDavProtocol">
+        <constructor-arg ref="response.handler.compressing"/>
+        <constructor-arg ref="handler.helper"/>
+        <constructor-arg ref="resource.type.helper.caldav"/>
+    </bean>
+
+    <bean id="protocol.caldav" class="com.ettrema.http.caldav.CalDavProtocol">
+        <constructor-arg ref="response.handler.compressing"/>
+        <constructor-arg ref="handler.helper"/>
+    </bean>
+
+    <bean id="protocol.handlers" class="com.bradmcevoy.http.ProtocolHandlers">
+        <constructor-arg>
+            <list>
+                <ref bean="protocol.http11"/>
+                <ref bean="protocol.webdav"/>
+                <ref bean="protocol.caldav"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="http.manager" class="com.bradmcevoy.http.HttpManager">
         <constructor-arg ref="caldav.demo.resource.factory" />
-        <constructor-arg ref="milton.response.handler.compressing" />
-        <constructor-arg ref="auth.service" />
+        <constructor-arg ref="response.handler.compressing" />
+        <constructor-arg ref="protocol.handlers" />
 
         <property name="filters">
             <list>
-                <ref bean="milton.debug.filter" />
+                <ref bean="debug.filter" />
             </list>
         </property>
 
@@ -39,7 +84,7 @@
 
     <!-- If added to the http manager, this filter will output request and responses
     to the logger -->
-    <bean id="milton.debug.filter" class="com.bradmcevoy.http.DebugFilter" >
+    <bean id="debug.filter" class="com.bradmcevoy.http.DebugFilter" >
         <!-- By default the debugfilter will log to the current user's home directory -->
         <!-- To change this behaviour uncomment the following line and set the path you want to log to-->
         <!--
