@@ -7,7 +7,7 @@ import com.bradmcevoy.http.ResourceFactory;
 public class TResourceFactory implements ResourceFactory {
 
     private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger( TResourceFactory.class );
-    public static final TFolderResource ROOT = new TFolderResource( (TFolderResource) null, "localhost:8084/MiltonTestWeb" );
+    public static final TFolderResource ROOT = new TFolderResource( (TFolderResource) null, "localhost:8084/milton-caldav-demo-1.5.0.1-SNAPSHOT" );
 
     static {
         TFolderResource folder = new TFolderResource( ROOT, "folder1" );
@@ -39,10 +39,6 @@ public class TResourceFactory implements ResourceFactory {
         }
         log.debug( "not found: " + path );
         return null;
-    }
-
-    public String getSupportedLevels() {
-        return "1,2";
     }
 
     private boolean isRoot( Path path ) {
