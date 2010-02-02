@@ -3,6 +3,7 @@ package com.bradmcevoy.http.webdav;
 import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.LockableResource;
 import com.bradmcevoy.http.Resource;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.xml.namespace.QName;
@@ -27,12 +28,14 @@ public class WebDavResourceTypeHelper implements ResourceTypeHelper {
         }
     }
 
+    //Need to create a ArrayList as Arrays.asList returns a fixed length list which
+    //cannot be extended.
     public List<String> getSupportedLevels( Resource r ) {
         log.trace( "getSupportedLevels" );
         if( r instanceof LockableResource ) {
-            return Arrays.asList( "1", "2" );
+            return new ArrayList<String> (Arrays.asList( "1", "2" ));
         } else {
-            return Arrays.asList( "1" );
+            return new ArrayList<String> (Arrays.asList( "1" ));
         }
     }
 }
