@@ -6,6 +6,11 @@ import com.bradmcevoy.http.CopyableResource;
 import com.bradmcevoy.http.DeletableResource;
 import com.bradmcevoy.http.DigestResource;
 import com.bradmcevoy.http.GetableResource;
+import com.bradmcevoy.http.LockInfo;
+import com.bradmcevoy.http.LockResult;
+import com.bradmcevoy.http.LockTimeout;
+import com.bradmcevoy.http.LockToken;
+import com.bradmcevoy.http.LockableResource;
 import com.bradmcevoy.http.MoveableResource;
 import com.bradmcevoy.http.PropFindableResource;
 import com.bradmcevoy.http.Request;
@@ -14,11 +19,14 @@ import com.bradmcevoy.http.webdav.PropPatchHandler.Fields;
 import com.bradmcevoy.http.Request.Method;
 import com.bradmcevoy.http.Resource;
 import com.bradmcevoy.http.http11.auth.DigestGenerator;
+import com.ettrema.http.AccessControlledResource;
+import com.ettrema.http.CalendarResource;
 import java.io.PrintWriter;
 import java.util.Date;
+import java.util.UUID;
 
 public abstract class TResource implements GetableResource, PropFindableResource, DeletableResource, MoveableResource,
-    CopyableResource, DigestResource {
+    CopyableResource, DigestResource, CalendarResource, AccessControlledResource, LockableResource {
 
     private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger( TResource.class );
     String name;
@@ -27,6 +35,7 @@ public abstract class TResource implements GetableResource, PropFindableResource
     TFolderResource parent;
     private String user;
     private String password;
+    private LockToken currentLock;
 
     protected abstract Object clone( TFolderResource newParent );
 
@@ -196,4 +205,41 @@ public abstract class TResource implements GetableResource, PropFindableResource
     protected void print( PrintWriter printer, String s ) {
         printer.print( s );
     }
+
+
+  public final LockResult lock(LockTimeout lockTimeout, LockInfo lockInfo)
+  {
+    log.trace("Lock : " + lockTimeout + " info : " + lockInfo + " on resource : " + getName() + " in : " + parent);
+    LockToken token = new LockToken();
+    token.info = lockInfo;
+    token.timeout = LockTimeout.parseTimeout("30");
+    token.tokenId = UUID.randomUUID().toString();
+    currentLock = token;
+    return LockResult.success(token);
+  }
+
+  public final LockResult refreshLock(String tokenId)
+  {
+    log.trace("RefreshLock : " + tokenId + " on resource : " + getName() + " in : " + parent);
+    //throw new UnsupportedOperationException("Not supported yet.");
+    LockToken token = new LockToken();
+    token.info = null;
+    token.timeout = LockTimeout.parseTimeout("30");
+    token.tokenId = currentLock.tokenId;
+    currentLock = token;
+    return LockResult.success(token);
+  }
+
+  public void unlock(String arg0)
+  {
+    log.trace("UnLock : " + arg0 + " on resource : " + getName() + " in : " + parent);
+    currentLock = null;
+    //throw new UnsupportedOperationException("Not supported yet.");
+  }
+
+  public final LockToken getCurrentLock()
+  {
+    log.trace("GetCurrentLock");
+    return currentLock;
+  }
 }
