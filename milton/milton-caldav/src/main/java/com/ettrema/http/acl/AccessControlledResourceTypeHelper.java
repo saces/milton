@@ -18,6 +18,7 @@ public class AccessControlledResourceTypeHelper implements ResourceTypeHelper {
     private final ResourceTypeHelper wrapped;
 
     public AccessControlledResourceTypeHelper( ResourceTypeHelper wrapped ) {
+        log.debug( "AccessControlledResourceTypeHelper constructed :"+wrapped.getClass().getSimpleName() );
         this.wrapped = wrapped;
     }
 

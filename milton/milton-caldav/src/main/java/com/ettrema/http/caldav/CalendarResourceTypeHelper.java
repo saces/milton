@@ -18,6 +18,7 @@ public class CalendarResourceTypeHelper implements ResourceTypeHelper {
     private final ResourceTypeHelper wrapped;
 
     public CalendarResourceTypeHelper( ResourceTypeHelper wrapped ) {
+        log.debug( "CalendarResourceTypeHelper constructed :"+wrapped.getClass().getSimpleName() );
         this.wrapped = wrapped;
     }
 
