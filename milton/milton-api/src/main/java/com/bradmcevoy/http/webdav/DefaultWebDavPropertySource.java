@@ -1,6 +1,5 @@
 package com.bradmcevoy.http.webdav;
 
-import com.bradmcevoy.property.PropertySource;
 import com.bradmcevoy.http.CollectionResource;
 import com.bradmcevoy.http.DateUtils;
 import com.bradmcevoy.http.GetableResource;
@@ -8,18 +7,14 @@ import com.bradmcevoy.http.LockToken;
 import com.bradmcevoy.http.LockableResource;
 import com.bradmcevoy.http.PropFindableResource;
 import com.bradmcevoy.http.PutableResource;
-import com.bradmcevoy.http.Resource;
 import com.bradmcevoy.http.Utils;
 import com.bradmcevoy.http.XmlWriter;
 import com.bradmcevoy.http.http11.DefaultHttp11ResponseHandler;
 import com.bradmcevoy.http.quota.DefaultQuotaDataAccessor;
 import com.bradmcevoy.http.quota.QuotaDataAccessor;
 import com.bradmcevoy.http.webdav.WebDavProtocol.SupportedLocks;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.xml.namespace.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +23,10 @@ import org.slf4j.LoggerFactory;
  *
  * @author brad
  */
-public class DefaultWebDavPropertySource implements PropertySource {
+public class DefaultWebDavPropertySource extends AbstractPropertySource {
 
     private static final Logger log = LoggerFactory.getLogger( DefaultWebDavPropertySource.class );
-    private final Map<String, StandardProperty> writersMap = new HashMap<String, StandardProperty>();
+    
     private final ResourceTypeHelper resourceTypeHelper;
     private final QuotaDataAccessor quotaDataAccessor;
 
@@ -63,60 +58,6 @@ public class DefaultWebDavPropertySource implements PropertySource {
         add( new QuotaAvailableBytesPropertyWriter() );
         add( new QuotaUsedBytesPropertyWriter() );
 
-    }
-
-    public Object getProperty( QName name, Resource r ) {
-        if( !name.getNamespaceURI().equals( WebDavProtocol.NS_DAV ) ) {
-            return null;
-        }
-        StandardProperty pa = writersMap.get( name.getLocalPart() );
-        if( pa == null ) return null;
-        if( r instanceof PropFindableResource ) {
-            return pa.getValue( (PropFindableResource) r );
-        } else {
-            return null;
-        }
-    }
-
-    public void setProperty( QName name, Object value, Resource r ) {
-        throw new UnsupportedOperationException( "Cannot set readonly property: " + name );
-    }
-
-    public void clearProperty( QName name, Resource r ) {
-        throw new UnsupportedOperationException( "Cannot set readonly property: " + name );
-    }
-
-    public List<QName> getAllPropertyNames( Resource r ) {
-        List<QName> list = new ArrayList<QName>();
-        for( String nm : this.writersMap.keySet() ) {
-            QName qname = new QName( WebDavProtocol.NS_DAV, nm );
-            list.add( qname );
-        }
-        return list;
-    }
-
-    public PropertyMetaData getPropertyMetaData( QName name, Resource r ) {
-        if( !name.getNamespaceURI().equals( WebDavProtocol.NS_DAV ) )
-            return PropertyMetaData.UNKNOWN;
-        StandardProperty pa = writersMap.get( name.getLocalPart() );
-        if( pa == null ) {
-            return PropertyMetaData.UNKNOWN;
-        } else {
-            if( r instanceof PropFindableResource ) {
-                return new PropertyMetaData( PropertyAccessibility.READ_ONLY, pa.getValueClass() );
-            } else {
-                return PropertyMetaData.UNKNOWN;
-            }
-        }
-    }
-
-    public interface StandardProperty<T> {
-
-        String fieldName();
-
-        T getValue( PropFindableResource res );
-
-        Class getValueClass();
     }
 
     class DisplayNamePropertyWriter implements StandardProperty<String> {
@@ -399,9 +340,5 @@ public class DefaultWebDavPropertySource implements PropertySource {
 
     void sendDateProp( XmlWriter writer, String name, Date date ) {
         sendStringProp( writer, name, ( date == null ? null : DateUtils.formatDate( date ) ) );
-    }
-
-    private void add( StandardProperty pw ) {
-        writersMap.put( pw.fieldName(), pw );
     }
 }
