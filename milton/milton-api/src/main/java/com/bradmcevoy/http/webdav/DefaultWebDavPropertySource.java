@@ -80,6 +80,21 @@ public class DefaultWebDavPropertySource extends AbstractPropertySource {
         }
     }
 
+    class CreationDatePropertyWriter implements StandardProperty<Date> {
+
+        public String fieldName() {
+            return "getcreated";
+        }
+
+        public Date getValue( PropFindableResource res ) {
+            return res.getModifiedDate();
+        }
+
+        public Class<Date> getValueClass() {
+            return Date.class;
+        }
+    }
+
     class LastModifiedDatePropertyWriter implements StandardProperty<Date> {
 
         public String fieldName() {
@@ -95,24 +110,7 @@ public class DefaultWebDavPropertySource extends AbstractPropertySource {
         }
     }
 
-    class CreationDatePropertyWriter implements StandardProperty<Date> {
 
-        public void append( XmlWriter xmlWriter, PropFindableResource res, String href ) {
-            sendDateProp( xmlWriter, "D:" + fieldName(), getValue( res ) );
-        }
-
-        public Date getValue( PropFindableResource res ) {
-            return res.getCreateDate();
-        }
-
-        public String fieldName() {
-            return "creationdate";
-        }
-
-        public Class<Date> getValueClass() {
-            return Date.class;
-        }
-    }
 
     class ResourceTypePropertyWriter implements StandardProperty<List<QName>> {
 
