@@ -7,12 +7,15 @@ import com.bradmcevoy.http.LockToken;
 import com.bradmcevoy.http.LockableResource;
 import com.bradmcevoy.http.PropFindableResource;
 import com.bradmcevoy.http.PutableResource;
+import com.bradmcevoy.http.Resource;
 import com.bradmcevoy.http.Utils;
 import com.bradmcevoy.http.XmlWriter;
 import com.bradmcevoy.http.http11.DefaultHttp11ResponseHandler;
 import com.bradmcevoy.http.quota.DefaultQuotaDataAccessor;
 import com.bradmcevoy.http.quota.QuotaDataAccessor;
+import com.bradmcevoy.http.webdav.PropertyMap.StandardProperty;
 import com.bradmcevoy.http.webdav.WebDavProtocol.SupportedLocks;
+import com.bradmcevoy.property.PropertySource;
 import java.util.Date;
 import java.util.List;
 import javax.xml.namespace.QName;
@@ -23,12 +26,12 @@ import org.slf4j.LoggerFactory;
  *
  * @author brad
  */
-public class DefaultWebDavPropertySource extends AbstractPropertySource {
+public class DefaultWebDavPropertySource implements PropertySource {
 
     private static final Logger log = LoggerFactory.getLogger( DefaultWebDavPropertySource.class );
-    
     private final ResourceTypeHelper resourceTypeHelper;
     private final QuotaDataAccessor quotaDataAccessor;
+    private final PropertyMap propertyMap;
 
     public DefaultWebDavPropertySource( ResourceTypeHelper resourceTypeHelper ) {
         this( resourceTypeHelper, new DefaultQuotaDataAccessor() );
@@ -37,36 +40,50 @@ public class DefaultWebDavPropertySource extends AbstractPropertySource {
     public DefaultWebDavPropertySource( ResourceTypeHelper resourceTypeHelper, QuotaDataAccessor quotaDataAccessor ) {
         this.resourceTypeHelper = resourceTypeHelper;
         this.quotaDataAccessor = quotaDataAccessor;
-        log.info( "DefaultWebDavPropertySource: resourceTypeHelper: " + resourceTypeHelper.getClass());
-        log.info( "DefaultWebDavPropertySource: quotaDataAccessor: " + quotaDataAccessor.getClass());
-        Thread.dumpStack();
-        add( new ContentLengthPropertyWriter() );
-        add( new ContentTypePropertyWriter() );
-        add( new CreationDatePropertyWriter() );
-        add( new DisplayNamePropertyWriter() );
-        add( new LastModifiedDatePropertyWriter() );
-        add( new ResourceTypePropertyWriter() );
-        add( new EtagPropertyWriter() );
+        this.propertyMap = new PropertyMap( WebDavProtocol.NS_DAV );
+        log.info( "DefaultWebDavPropertySource: resourceTypeHelper: " + resourceTypeHelper.getClass() );
+        log.info( "DefaultWebDavPropertySource: quotaDataAccessor: " + quotaDataAccessor.getClass() );
+        propertyMap.add( new ContentLengthPropertyWriter() );
+        propertyMap.add( new ContentTypePropertyWriter() );
+        propertyMap.add( new CreationDatePropertyWriter() );
+        propertyMap.add( new DisplayNamePropertyWriter() );
+        propertyMap.add( new LastModifiedDatePropertyWriter() );
+        propertyMap.add( new ResourceTypePropertyWriter() );
+        propertyMap.add( new EtagPropertyWriter() );
 
-        add( new SupportedLockPropertyWriter() );
-        add( new LockDiscoveryPropertyWriter() );
+        propertyMap.add( new SupportedLockPropertyWriter() );
+        propertyMap.add( new LockDiscoveryPropertyWriter() );
 
-        add( new MSIsCollectionPropertyWriter() );
-        add( new MSIsReadOnlyPropertyWriter() );
-        add( new MSNamePropertyWriter() );
+        propertyMap.add( new MSIsCollectionPropertyWriter() );
+        propertyMap.add( new MSIsReadOnlyPropertyWriter() );
+        propertyMap.add( new MSNamePropertyWriter() );
 
-        add( new QuotaAvailableBytesPropertyWriter() );
-        add( new QuotaUsedBytesPropertyWriter() );
+        propertyMap.add( new QuotaAvailableBytesPropertyWriter() );
+        propertyMap.add( new QuotaUsedBytesPropertyWriter() );
 
     }
 
+    public Object getProperty( QName name, Resource r ) {
+        return propertyMap.getProperty( name, r );
+    }
+
+    public void setProperty( QName name, Object value, Resource r ) {
+        throw new UnsupportedOperationException( "Not supported. Standard webdav properties are not writable" );
+    }
+
+    public PropertyMetaData getPropertyMetaData( QName name, Resource r ) {
+        return propertyMap.getPropertyMetaData( name, r );
+    }
+
+    public void clearProperty( QName name, Resource r ) {
+        throw new UnsupportedOperationException( "Not supported. Standard webdav properties are not writable" );
+    }
+
+    public List<QName> getAllPropertyNames( Resource r ) {
+        return propertyMap.getAllPropertyNames( r );
+    }
+
     class DisplayNamePropertyWriter implements StandardProperty<String> {
-
-        public void append( XmlWriter writer, PropFindableResource res, String href ) {
-            String s = nameEncode( getValue( res ) );
-            sendStringProp( writer, "D:" + fieldName(), s );
-        }
-
         public String getValue( PropFindableResource res ) {
             return res.getName();
         }
@@ -110,8 +127,6 @@ public class DefaultWebDavPropertySource extends AbstractPropertySource {
         }
     }
 
-
-
     class ResourceTypePropertyWriter implements StandardProperty<List<QName>> {
 
         public List<QName> getValue( PropFindableResource res ) {
@@ -129,11 +144,6 @@ public class DefaultWebDavPropertySource extends AbstractPropertySource {
     }
 
     class ContentTypePropertyWriter implements StandardProperty<String> {
-
-        public void append( XmlWriter xmlWriter, PropFindableResource res, String href ) {
-            String ct = getValue( res );
-            sendStringProp( xmlWriter, "D:" + fieldName(), ct );
-        }
 
         public String getValue( PropFindableResource res ) {
             if( res instanceof GetableResource ) {
@@ -154,11 +164,6 @@ public class DefaultWebDavPropertySource extends AbstractPropertySource {
     }
 
     class ContentLengthPropertyWriter implements StandardProperty<Long> {
-
-        public void append( XmlWriter xmlWriter, PropFindableResource res, String href ) {
-            Long ll = getValue( res );
-            sendStringProp( xmlWriter, "D:" + fieldName(), ll == null ? "" : ll.toString() );
-        }
 
         public Long getValue( PropFindableResource res ) {
             if( res instanceof GetableResource ) {
@@ -181,11 +186,6 @@ public class DefaultWebDavPropertySource extends AbstractPropertySource {
 
     class QuotaUsedBytesPropertyWriter implements StandardProperty<Long> {
 
-        public void append( XmlWriter xmlWriter, PropFindableResource res, String href ) {
-            Long ll = getValue( res );
-            sendStringProp( xmlWriter, "D:" + fieldName(), ll == null ? "" : ll.toString() );
-        }
-
         public Long getValue( PropFindableResource res ) {
             return quotaDataAccessor.getQuotaUsed( res );
         }
@@ -201,11 +201,6 @@ public class DefaultWebDavPropertySource extends AbstractPropertySource {
 
     class QuotaAvailableBytesPropertyWriter implements StandardProperty<Long> {
 
-        public void append( XmlWriter xmlWriter, PropFindableResource res, String href ) {
-            Long ll = getValue( res );
-            sendStringProp( xmlWriter, "D:" + fieldName(), ll == null ? "" : ll.toString() );
-        }
-
         public Long getValue( PropFindableResource res ) {
             return quotaDataAccessor.getQuotaAvailable( res );
         }
@@ -220,13 +215,6 @@ public class DefaultWebDavPropertySource extends AbstractPropertySource {
     }
 
     class EtagPropertyWriter implements StandardProperty<String> {
-
-        public void append( XmlWriter writer, PropFindableResource resource, String href ) {
-            String etag = getValue( resource );
-            if( etag != null ) {
-                sendStringProp( writer, "D:getetag", etag );
-            }
-        }
 
         public String getValue( PropFindableResource res ) {
             String etag = DefaultHttp11ResponseHandler.generateEtag( res );
