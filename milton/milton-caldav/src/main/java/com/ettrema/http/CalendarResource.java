@@ -6,4 +6,6 @@ package com.ettrema.http;
  */
 public interface CalendarResource {
 
+  public String getName();
+
 }

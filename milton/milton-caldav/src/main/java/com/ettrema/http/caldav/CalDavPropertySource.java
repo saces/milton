@@ -1,8 +1,11 @@
 package com.ettrema.http.caldav;
 
+import com.bradmcevoy.http.PropFindableResource;
 import com.bradmcevoy.http.Resource;
 import com.bradmcevoy.http.webdav.PropertyMap;
+import com.bradmcevoy.http.webdav.PropertyMap.StandardProperty;
 import com.bradmcevoy.property.PropertySource;
+import com.ettrema.http.CalendarResource;
 import java.util.List;
 import javax.xml.namespace.QName;
 
@@ -15,7 +18,7 @@ public class CalDavPropertySource implements PropertySource{
     private final PropertyMap propertyMap;
 
     public CalDavPropertySource() {
-        propertyMap = new PropertyMap( "whatever-the-caldav-namespace-is---might-be-DAV");
+        propertyMap = new PropertyMap( "urn:ietf:params:xml:ns:caldav");
     }
 
     public Object getProperty( QName name, Resource r ) {
@@ -38,4 +41,19 @@ public class CalDavPropertySource implements PropertySource{
         return propertyMap.getAllPropertyNames( r );
     }
 
+
+    class CalenderDescriptionProperty implements StandardProperty<String> {
+
+        public String fieldName() {
+            return "calendar-description";
+        }
+
+        public String getValue( PropFindableResource res ) {
+            return res.getName();
+        }
+
+        public Class<String> getValueClass() {
+            return String.class;
+        }
+    }
 }
