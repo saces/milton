@@ -38,9 +38,4 @@ public class CalDavPropertySource implements PropertySource{
         return propertyMap.getAllPropertyNames( r );
     }
 
-
-
-    // TODO: implement properties
-
-
 }
