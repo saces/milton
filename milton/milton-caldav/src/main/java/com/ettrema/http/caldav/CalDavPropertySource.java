@@ -5,7 +5,6 @@ import com.bradmcevoy.http.Resource;
 import com.bradmcevoy.http.webdav.PropertyMap;
 import com.bradmcevoy.http.webdav.PropertyMap.StandardProperty;
 import com.bradmcevoy.property.PropertySource;
-import com.ettrema.http.CalendarResource;
 import java.util.List;
 import javax.xml.namespace.QName;
 
