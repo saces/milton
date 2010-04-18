@@ -15,6 +15,27 @@
             </goals>
         </action>
         <action>
+            <actionName>CUSTOM-cargo:start</actionName>
+            <displayName>tomcat:start</displayName>
+            <goals>
+                <goal>cargo:start</goal>
+            </goals>
+        </action>
+        <action>
+            <actionName>CUSTOM-cargo:deployer-deploy</actionName>
+            <displayName>tomcat:deploy</displayName>
+            <goals>
+                <goal>cargo:deployer-deploy</goal>
+            </goals>
+        </action>
+        <action>
+            <actionName>CUSTOM-cargo:stop</actionName>
+            <displayName>tomcat:stop</displayName>
+            <goals>
+                <goal>cargo:stop</goal>
+            </goals>
+        </action>
+        <action>
             <actionName>run</actionName>
             <packagings>
                 <packaging>war</packaging>
