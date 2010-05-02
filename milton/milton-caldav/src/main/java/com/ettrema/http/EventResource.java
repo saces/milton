@@ -6,7 +6,7 @@ import java.util.Date;
  *
  * @author brad
  */
-public interface EventResource {
+public interface EventResource extends ICalResource {
     Date getStart();
 
     Date getEnd();

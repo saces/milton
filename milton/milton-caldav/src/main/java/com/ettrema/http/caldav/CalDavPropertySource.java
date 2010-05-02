@@ -2,9 +2,11 @@ package com.ettrema.http.caldav;
 
 import com.bradmcevoy.http.PropFindableResource;
 import com.bradmcevoy.http.Resource;
+import com.bradmcevoy.http.values.CData;
 import com.bradmcevoy.http.webdav.PropertyMap;
 import com.bradmcevoy.http.webdav.PropertyMap.StandardProperty;
 import com.bradmcevoy.property.PropertySource;
+import com.ettrema.http.ICalResource;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.namespace.QName;
@@ -26,12 +28,13 @@ public class CalDavPropertySource implements PropertySource {
     public static final String CALSERVER_NS = "http://calendarserver.org/ns/";
     private final PropertyMap propertyMapCalDav;
     private final PropertyMap propertyMapCalServer;
+    private final ICalFormatter iCalFormatter = new ICalFormatter();
 
     public CalDavPropertySource() {
         log.debug( "--- CalDavPropertySource: ns: " + CALDAV_NS );
         propertyMapCalDav = new PropertyMap( CALDAV_NS );
-        CalenderDescriptionProperty p = new CalenderDescriptionProperty();
-        propertyMapCalDav.add( p );
+        propertyMapCalDav.add( new CalenderDescriptionProperty() );
+        propertyMapCalDav.add( new CalendarDataProperty());
 
         propertyMapCalServer = new PropertyMap( CALSERVER_NS );
         propertyMapCalServer.add( new CTagProperty());
@@ -119,6 +122,24 @@ public class CalDavPropertySource implements PropertySource {
 
         public Class<String> getValueClass() {
             return String.class;
+        }
+    }
+
+    class CalendarDataProperty implements StandardProperty<CData> {
+        public String fieldName() {
+            return "calendar-data";
+        }
+
+        public CData getValue( PropFindableResource res ) {
+            if( res instanceof ICalResource) {
+                return new CData(iCalFormatter.format((ICalResource) res)); 
+            } else {
+                return null;
+            }
+        }
+
+        public Class<CData> getValueClass() {
+            return CData.class;
         }
     }
 

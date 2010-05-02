@@ -22,7 +22,6 @@ public class TCalendarResource extends TFolderResource implements CalendarResour
 
     public TEvent addEvent(String name, Date start, Date end, String summary) {
         TEvent e = new TEvent( this, name, start, end, summary );
-        this.children.add( e );
         return e;
     }
 }
