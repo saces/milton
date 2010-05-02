@@ -3,6 +3,7 @@ package com.ettrema.http.caldav.demo;
 import com.bradmcevoy.common.Path;
 import com.bradmcevoy.http.Resource;
 import com.bradmcevoy.http.ResourceFactory;
+import java.util.Date;
 
 public class TResourceFactory implements ResourceFactory {
 
@@ -12,6 +13,8 @@ public class TResourceFactory implements ResourceFactory {
     static {
         TFolderResource folder = new TFolderResource( ROOT, "folder1" );
         TCalendarResource cal1 = new TCalendarResource( folder, "cal1" );
+        cal1.addEvent( "ex1", new Date(), new Date(), "An example event");
+
     }
 
     public Resource getResource( String host, String url ) {

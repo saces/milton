@@ -25,7 +25,17 @@ public class PropertyMap {
         this.nameSpace = nameSpace;
     }
 
-
+    public boolean hasProperty(QName name) {
+        if( !name.getNamespaceURI().equals( nameSpace ) ) {
+            return false;
+        }
+        StandardProperty pa = writersMap.get( name.getLocalPart() );
+        if( pa == null ) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 
     public Object getProperty( QName name, Resource r ) {
         if( !name.getNamespaceURI().equals( nameSpace ) ) {

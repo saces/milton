@@ -1,20 +1,15 @@
 package com.ettrema.http.caldav.demo;
 
-import com.bradmcevoy.http.Range;
-import com.bradmcevoy.http.exceptions.BadRequestException;
-import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 import com.ettrema.http.AccessControlledResource;
 import com.ettrema.http.CalendarResource;
 import com.ettrema.http.ReportableResource;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Map;
+import java.util.Date;
 
 /**
  *
  * @author brad
  */
-public class TCalendarResource extends TResource implements CalendarResource, AccessControlledResource, ReportableResource{
+public class TCalendarResource extends TFolderResource implements CalendarResource, AccessControlledResource, ReportableResource{
 
     public TCalendarResource( TFolderResource parent, String name ) {
         super( parent, name );
@@ -25,12 +20,9 @@ public class TCalendarResource extends TResource implements CalendarResource, Ac
         return new TCalendarResource( newParent, name);
     }
 
-    public void sendContent( OutputStream out, Range range, Map<String, String> params, String contentType ) throws IOException, NotAuthorizedException, BadRequestException {
-        out.write( "hi there".getBytes());
+    public TEvent addEvent(String name, Date start, Date end, String summary) {
+        TEvent e = new TEvent( this, name, start, end, summary );
+        this.children.add( e );
+        return e;
     }
-
-    public String getContentType( String accepts ) {
-        return "text";
-    }
-
 }

@@ -68,6 +68,13 @@
     </bean>
 
     <bean id="protocol.caldav" class="com.ettrema.http.caldav.CalDavProtocol">
+        <constructor-arg ref="caldav.demo.resource.factory" />
+        <constructor-arg>
+            <list>
+                <ref bean="property.source.default"/>
+                <ref bean="property.source.caldav"/> <!-- Hey Alex, this is yours -->
+            </list>
+        </constructor-arg>
         <constructor-arg ref="response.handler.compressing"/>
         <constructor-arg ref="handler.helper"/>
     </bean>

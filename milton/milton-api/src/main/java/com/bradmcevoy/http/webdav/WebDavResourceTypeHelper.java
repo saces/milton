@@ -21,8 +21,10 @@ public class WebDavResourceTypeHelper implements ResourceTypeHelper {
     public List<QName> getResourceTypes( Resource r ) {
         log.debug( "getResourceTypes" );
         if( r instanceof CollectionResource ) {
+            ArrayList<QName> list = new ArrayList<QName>();
             QName qn = new QName( WebDavProtocol.NS_DAV, "collection" );
-            return Arrays.asList( qn );
+            list.add( qn );
+            return list;
         } else {
             return null;
         }

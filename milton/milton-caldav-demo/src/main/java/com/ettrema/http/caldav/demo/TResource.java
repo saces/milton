@@ -20,13 +20,12 @@ import com.bradmcevoy.http.Request.Method;
 import com.bradmcevoy.http.Resource;
 import com.bradmcevoy.http.http11.auth.DigestGenerator;
 import com.ettrema.http.AccessControlledResource;
-import com.ettrema.http.CalendarResource;
 import java.io.PrintWriter;
 import java.util.Date;
 import java.util.UUID;
 
 public abstract class TResource implements GetableResource, PropFindableResource, DeletableResource, MoveableResource,
-    CopyableResource, DigestResource, CalendarResource, AccessControlledResource, LockableResource {
+    CopyableResource, DigestResource, AccessControlledResource, LockableResource {
 
     private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger( TResource.class );
     String name;

@@ -3,6 +3,7 @@ package com.ettrema.http.caldav;
 import com.bradmcevoy.http.Resource;
 import com.bradmcevoy.http.webdav.ResourceTypeHelper;
 import com.ettrema.http.CalendarResource;
+import java.util.ArrayList;
 import java.util.List;
 import javax.xml.namespace.QName;
 import org.slf4j.Logger;
@@ -25,10 +26,14 @@ public class CalendarResourceTypeHelper implements ResourceTypeHelper {
     public List<QName> getResourceTypes( Resource r ) {
         log.debug( "getResourceTypes" );
         List<QName> list = wrapped.getResourceTypes( r );
-        if( r instanceof CalendarResource ) {
-            //TODO: Need to find out what the QNames for calendars are
-            //QName qn = new QName( WebDavProtocol.NS_DAV, "collection");
-            //list.add(qn);
+        if( r instanceof CalendarResource ) {            
+            // http://greenbytes.de/tech/webdav/draft-dusseault-caldav-04.html#new-resources
+            QName qn = new QName( CalDavPropertySource.CALDAV_NS, "calendar");
+            log.debug( "is a calendar, added: " + qn);
+            if( list == null ) {
+                list = new ArrayList<QName>();
+            }
+            list.add(qn);
         }
         return list;
     }

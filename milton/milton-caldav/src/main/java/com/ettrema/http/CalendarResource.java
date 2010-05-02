@@ -1,11 +1,12 @@
 package com.ettrema.http;
 
+import com.bradmcevoy.http.CollectionResource;
+
 /**
  *
  * @author alex
  */
-public interface CalendarResource {
+public interface CalendarResource extends CollectionResource {
 
-  public String getName();
 
 }

@@ -1,21 +1,25 @@
 package com.ettrema.http.report;
 
-import com.bradmcevoy.http.Handler;
-import com.bradmcevoy.http.HandlerHelper;
+import com.bradmcevoy.http.ExistingEntityHandler;
 import com.bradmcevoy.http.HttpManager;
 import com.bradmcevoy.http.Request;
 import com.bradmcevoy.http.Request.Method;
 import com.bradmcevoy.http.Resource;
+import com.bradmcevoy.http.ResourceHandlerHelper;
 import com.bradmcevoy.http.Response;
 import com.bradmcevoy.http.exceptions.BadRequestException;
 import com.bradmcevoy.http.exceptions.ConflictException;
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 import com.bradmcevoy.http.webdav.WebDavResponseHandler;
 import com.bradmcevoy.io.ReadingException;
-import com.bradmcevoy.io.StreamUtils;
 import com.bradmcevoy.io.WritingException;
 import com.ettrema.http.ReportableResource;
-import java.io.InputStream;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import org.jdom.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,28 +27,60 @@ import org.slf4j.LoggerFactory;
  *
  * @author alex
  */
-public class ReportHandler implements Handler {
+public class ReportHandler implements ExistingEntityHandler {
     private Logger log = LoggerFactory.getLogger(ReportHandler.class);
 
     private final WebDavResponseHandler responseHandler;
-    private final HandlerHelper handlerHelper;
+    private final ResourceHandlerHelper resourceHandlerHelper;
+    private final Map<String,Report> reports;
+    private final String reportNames;
 
-    public ReportHandler( WebDavResponseHandler responseHandler, HandlerHelper handlerHelper ) {
+    public ReportHandler( WebDavResponseHandler responseHandler, ResourceHandlerHelper resourceHandlerHelper, List<Report> reports ) {
         this.responseHandler = responseHandler;
-        this.handlerHelper = handlerHelper;
+        this.resourceHandlerHelper = resourceHandlerHelper;
+        this.reports = new HashMap<String, Report>();
+        String s = "";
+        for( Report r : reports ) {
+            this.reports.put( r.getName(), r);
+            s += r.getName() + ",";
+        }
+        this.reportNames = s;
     }
+
 
     public String[] getMethods() {
         return new String[]{Method.REPORT.code};
     }
-
     public void process( HttpManager httpManager, Request request, Response response ) throws ConflictException, NotAuthorizedException, BadRequestException {
+        resourceHandlerHelper.process( httpManager, request, response, this );
+    }
+
+    public void processResource( HttpManager manager, Request request, Response response, Resource r ) throws NotAuthorizedException, ConflictException, BadRequestException {
+        resourceHandlerHelper.processResource( manager, request, response, r, this );
+    }
+
+    public void processExistingResource( HttpManager manager, Request request, Response response, Resource resource ) throws NotAuthorizedException, BadRequestException, ConflictException {
         try {
-            InputStream in = this.getClass().getResourceAsStream( "/caldav-report.sample.xml" );
-            StreamUtils.readTo( in, response.getOutputStream(), true, false );
+            org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
+            org.jdom.Document doc = builder.build(request.getInputStream());
+            String reportName = doc.getRootElement().getName();
+            Report r = reports.get( reportName);
+            if( r == null ) {
+                log.error( "report not known: " + reportName + "  I only know about these reports: " + reportNames);
+                throw new BadRequestException( resource );
+            } else {
+                String xml = r.process( request.getHostHeader(), resource, doc );
+                response.setStatus( Response.Status.SC_MULTI_STATUS );
+                response.getOutputStream().write( xml.getBytes());
+                response.getOutputStream().flush();
+            }
+        } catch( JDOMException ex ) {
+            java.util.logging.Logger.getLogger( ReportHandler.class.getName() ).log( Level.SEVERE, null, ex );
         } catch( ReadingException ex ) {
             throw new RuntimeException( ex );
         } catch( WritingException ex ) {
+            throw new RuntimeException( ex );
+        } catch(IOException ex) {
             throw new RuntimeException( ex );
         }
     }

@@ -76,6 +76,17 @@ public class PropFindPropertyBuilder {
         return propFindResponses;
     }
 
+    public ValueAndType getProperty(QName field, Resource resource) {
+        for( PropertySource source : propertySources ) {
+            PropertyMetaData meta = source.getPropertyMetaData( field, resource );
+            if( meta != null && !meta.isUnknown() ) {
+                Object val = source.getProperty( field, resource );
+                return new ValueAndType( val, meta.getValueType() );
+            }
+        }
+        return null;
+    }
+
     private void appendResponses( List<PropFindResponse> responses, PropFindableResource resource, int requestedDepth, PropFindRequestFieldParser.ParseResult parseResult, String encodedCollectionUrl ) {
         try {
             String collectionHref = suffixSlash( encodedCollectionUrl );
