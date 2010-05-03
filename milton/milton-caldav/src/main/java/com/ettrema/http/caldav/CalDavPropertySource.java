@@ -131,9 +131,12 @@ public class CalDavPropertySource implements PropertySource {
         }
 
         public CData getValue( PropFindableResource res ) {
+            log.debug( "getValue: " + res.getClass());
             if( res instanceof ICalResource) {
-                return new CData(iCalFormatter.format((ICalResource) res)); 
+                ICalResource ical = (ICalResource) res;
+                return new CData( ical.getICalData() );
             } else {
+                log.warn( "getValue: not a ICalResource");
                 return null;
             }
         }
