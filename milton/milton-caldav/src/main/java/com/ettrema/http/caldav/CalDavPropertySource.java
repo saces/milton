@@ -35,18 +35,29 @@ public class CalDavPropertySource implements PropertySource {
         propertyMapCalDav = new PropertyMap( CALDAV_NS );
         propertyMapCalDav.add( new CalenderDescriptionProperty() );
         propertyMapCalDav.add( new CalendarDataProperty());
+        propertyMapCalDav.add( new CalenderHomeSetProperty());
+        propertyMapCalDav.add( new CalenderUserAddressSetProperty());
+        propertyMapCalDav.add( new ScheduleInboxProperty());
+        propertyMapCalDav.add( new ScheduleOutboxProperty());
 
         propertyMapCalServer = new PropertyMap( CALSERVER_NS );
         propertyMapCalServer.add( new CTagProperty());
+        propertyMapCalServer.add( new XMPPProperty());
+        propertyMapCalServer.add( new DropBoxProperty());
     }
 
+
+    //TODO: remove debug logging once it's working
     public Object getProperty( QName name, Resource r ) {
         log.debug( "getProperty: " + name.getLocalPart() );
+        Object o;
         if( propertyMapCalDav.hasProperty( name )) {
-            return propertyMapCalDav.getProperty( name, r );
+            o = propertyMapCalDav.getProperty( name, r );
         } else {
-            return propertyMapCalServer.getProperty( name, r );
+            o = propertyMapCalServer.getProperty( name, r );
         }
+        log.debug( "result : "+o );
+        return o;
     }
 
     public void setProperty( QName name, Object value, Resource r ) {
@@ -75,8 +86,129 @@ public class CalDavPropertySource implements PropertySource {
         return list;
     }
 
-    /**
-     *  https://trac.calendarserver.org/browser/CalendarServer/trunk/doc/Extensions/caldav-ctag.txt
+    class CalendarDataProperty implements StandardProperty<CData> {
+        public String fieldName() {
+            return "calendar-data";
+        }
+
+        public CData getValue( PropFindableResource res ) {
+            log.debug( "getValue: " + res.getClass());
+            if( res instanceof ICalResource) {
+                ICalResource ical = (ICalResource) res;
+                return new CData( ical.getICalData() );
+            } else {
+                log.warn( "getValue: not a ICalResource");
+                return null;
+            }
+        }
+
+        public Class<CData> getValueClass() {
+            return CData.class;
+        }
+    }
+
+    class CalenderDescriptionProperty implements StandardProperty<String> {
+
+        public String fieldName() {
+            return "calendar-description";
+        }
+
+        public String getValue( PropFindableResource res ) {
+            return res.getName();
+        }
+
+        public Class<String> getValueClass() {
+            return String.class;
+        }
+    }
+
+    class CalenderHomeSetProperty implements StandardProperty<String> {
+
+        public String fieldName() {
+            return "calendar-home-set";
+        }
+
+        public String getValue( PropFindableResource res ) {
+            return "http://localhost:8100/caldavdemo/folder1/cal1";
+        }
+
+        public Class<String> getValueClass() {
+            return String.class;
+        }
+    }
+
+    /* Scheduling support
+       see : http://ietfreport.isoc.org/idref/draft-desruisseaux-caldav-sched/       
+       for details
+     */
+    class CalenderUserAddressSetProperty implements StandardProperty<String> {
+
+        public String fieldName() {
+            return "calendar-user-address-set";
+        }
+
+        /**
+         * How can I return an array here ?
+         *
+
+          <C:calendar-user-address-set xmlns:D="DAV:"
+                                xmlns:C="urn:ietf:params:xml:ns:caldav">
+            <D:href>mailto:bernard@example.com</D:href>
+            <D:href>mailto:bernard.desruisseaux@example.com</D:href>
+          </C:calendar-user-address-set>
+
+         * @param res
+         * @return
+         */
+
+        public String getValue( PropFindableResource res ) {
+            String[] userAddressSet = new String[2];
+            userAddressSet[0]="a1@b.com";
+            userAddressSet[1]="a2@b.com";
+            return userAddressSet.toString();
+        }
+
+        public Class<String> getValueClass() {
+            return String.class;
+        }
+    }
+
+    class ScheduleInboxProperty implements StandardProperty<String> {
+
+        public String fieldName() {
+            return "schedule-inbox-URL";
+        }
+
+        public String getValue( PropFindableResource res ) {
+            return "http://localhost:8100/caldavdemo/folder1/cal1";
+        }
+
+        public Class<String> getValueClass() {
+            return String.class;
+        }
+    }
+
+    class ScheduleOutboxProperty implements StandardProperty<String> {
+
+        public String fieldName() {
+            return "schedule-outbox-URL";
+        }
+
+        public String getValue( PropFindableResource res ) {
+            return "http://localhost:8100/caldavdemo/folder1/cal1";
+        }
+
+        public Class<String> getValueClass() {
+            return String.class;
+        }
+    }
+
+   /**
+     *  CalendarServer support
+     * 
+     *  https://trac.calendarserver.org/browser/CalendarServer/trunk/doc/Extensions/caldav-ctag.txt\
+     *  http://code.google.com/p/sabredav/wiki/ICal
+     *
      *
      * 4.1.  getctag WebDAV Property
 173
@@ -123,37 +255,31 @@ public class CalDavPropertySource implements PropertySource {
         public Class<String> getValueClass() {
             return String.class;
         }
-    }
-
-    class CalendarDataProperty implements StandardProperty<CData> {
-        public String fieldName() {
-            return "calendar-data";
-        }
-
-        public CData getValue( PropFindableResource res ) {
-            log.debug( "getValue: " + res.getClass());
-            if( res instanceof ICalResource) {
-                ICalResource ical = (ICalResource) res;
-                return new CData( ical.getICalData() );
-            } else {
-                log.warn( "getValue: not a ICalResource");
-                return null;
-            }
-        }
-
-        public Class<CData> getValueClass() {
-            return CData.class;
-        }
-    }
-
-    class CalenderDescriptionProperty implements StandardProperty<String> {
+    }    
+    
+    class DropBoxProperty implements StandardProperty<String> {
 
         public String fieldName() {
-            return "calendar-description";
+            return "dropbox-home-URL";
         }
 
         public String getValue( PropFindableResource res ) {
-            return res.getName();
+            return "http://localhost:8100/caldavdemo/folder1/cal1";
+        }
+
+        public Class<String> getValueClass() {
+            return String.class;
+        }
+    }
+
+    class XMPPProperty implements StandardProperty<String> {
+
+        public String fieldName() {
+            return "xmpp-uri";
+        }
+
+        public String getValue( PropFindableResource res ) {
+            return "xmpp:romeo@montague.net";
         }
 
         public Class<String> getValueClass() {
