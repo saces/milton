@@ -57,6 +57,11 @@ public class WebDavProtocol implements HttpExtension {
         return Collections.unmodifiableSet( handlers );
     }
 
+    /**
+     * Used as a marker to generate supported locks element in propfind responses
+     *
+     * See SupportedLockValueWriter
+     */
     public static class SupportedLocks {
     }
 }

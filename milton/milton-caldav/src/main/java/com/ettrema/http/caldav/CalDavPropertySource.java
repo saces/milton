@@ -1,5 +1,6 @@
 package com.ettrema.http.caldav;
 
+import com.bradmcevoy.http.values.HrefList;
 import com.bradmcevoy.http.PropFindableResource;
 import com.bradmcevoy.http.Resource;
 import com.bradmcevoy.http.values.CData;
@@ -28,7 +29,6 @@ public class CalDavPropertySource implements PropertySource {
     public static final String CALSERVER_NS = "http://calendarserver.org/ns/";
     private final PropertyMap propertyMapCalDav;
     private final PropertyMap propertyMapCalServer;
-    private final ICalFormatter iCalFormatter = new ICalFormatter();
 
     public CalDavPropertySource() {
         log.debug( "--- CalDavPropertySource: ns: " + CALDAV_NS );
@@ -141,7 +141,7 @@ public class CalDavPropertySource implements PropertySource {
        see : http://ietfreport.isoc.org/idref/draft-desruisseaux-caldav-sched/       
        for details
      */
-    class CalenderUserAddressSetProperty implements StandardProperty<String> {
+    class CalenderUserAddressSetProperty implements StandardProperty<HrefList> {
 
         public String fieldName() {
             return "calendar-user-address-set";
@@ -161,15 +161,15 @@ public class CalDavPropertySource implements PropertySource {
          * @return
          */
 
-        public String getValue( PropFindableResource res ) {
-            String[] userAddressSet = new String[2];
-            userAddressSet[0]="a1@b.com";
-            userAddressSet[1]="a2@b.com";
-            return userAddressSet.toString();
+        public HrefList getValue( PropFindableResource res ) {
+            HrefList list = new HrefList();
+            list.add("a1@b.com");
+            list.add("a2@b.com");
+            return list;
         }
 
-        public Class<String> getValueClass() {
-            return String.class;
+        public Class<HrefList> getValueClass() {
+            return HrefList.class;
         }
     }
 

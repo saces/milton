@@ -49,6 +49,12 @@ public abstract class TResource implements GetableResource, PropFindableResource
         }
     }
 
+    public String getPrincipalURL() {
+        return user;
+    }
+
+
+
     public void setSecure( String user, String password ) {
         this.user = user;
         this.password = password;

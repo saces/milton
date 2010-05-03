@@ -50,6 +50,8 @@
 
     <bean id="property.source.caldav" class="com.ettrema.http.caldav.CalDavPropertySource"/>
 
+    <bean id="property.source.acl" class="com.ettrema.http.acl.ACLPropertySource"/>
+
     <bean id="protocol.http11" class="com.bradmcevoy.http.http11.Http11Protocol">
         <constructor-arg ref="response.handler.compressing"/>
         <constructor-arg ref="handler.helper"/>
@@ -62,7 +64,8 @@
         <constructor-arg>
             <list>
                 <ref bean="property.source.default"/>
-                <ref bean="property.source.caldav"/> <!-- Hey Alex, this is yours -->
+                <ref bean="property.source.caldav"/>
+                <ref bean="property.source.acl"/>
             </list>
         </constructor-arg>
     </bean>
