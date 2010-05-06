@@ -1,4 +1,4 @@
-package com.ettrema.http;
+package com.bradmcevoy.http;
 
 import com.bradmcevoy.http.Resource;
 

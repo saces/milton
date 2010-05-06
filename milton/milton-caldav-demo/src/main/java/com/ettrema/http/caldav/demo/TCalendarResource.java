@@ -4,7 +4,7 @@ import com.bradmcevoy.http.Resource;
 import com.bradmcevoy.io.StreamUtils;
 import com.ettrema.http.AccessControlledResource;
 import com.ettrema.http.CalendarResource;
-import com.ettrema.http.ReportableResource;
+import com.bradmcevoy.http.ReportableResource;
 import com.ettrema.http.caldav.ICalFormatter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

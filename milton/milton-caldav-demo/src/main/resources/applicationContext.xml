@@ -43,15 +43,6 @@
         <constructor-arg ref="response.handler" />
     </bean>
 
-    <bean id="property.source.default" class="com.bradmcevoy.http.webdav.DefaultWebDavPropertySource">
-        <!-- The caldav one wraps the default and ACL resource type helpers -->
-        <constructor-arg ref="resource.type.helper.caldav"/>
-    </bean>
-
-    <bean id="property.source.caldav" class="com.ettrema.http.caldav.CalDavPropertySource"/>
-
-    <bean id="property.source.acl" class="com.ettrema.http.acl.ACLPropertySource"/>
-
     <bean id="protocol.http11" class="com.bradmcevoy.http.http11.Http11Protocol">
         <constructor-arg ref="response.handler.compressing"/>
         <constructor-arg ref="handler.helper"/>
@@ -63,23 +54,19 @@
         <constructor-arg ref="resource.type.helper.caldav"/>
         <constructor-arg>
             <list>
-                <ref bean="property.source.default"/>
-                <ref bean="property.source.caldav"/>
-                <ref bean="property.source.acl"/>
             </list>
         </constructor-arg>
     </bean>
 
     <bean id="protocol.caldav" class="com.ettrema.http.caldav.CalDavProtocol">
         <constructor-arg ref="caldav.demo.resource.factory" />
-        <constructor-arg>
-            <list>
-                <ref bean="property.source.default"/>
-                <ref bean="property.source.caldav"/> <!-- Hey Alex, this is yours -->
-            </list>
-        </constructor-arg>
         <constructor-arg ref="response.handler.compressing"/>
         <constructor-arg ref="handler.helper"/>
+        <constructor-arg ref="protocol.webdav"/>
+    </bean>
+
+    <bean id="protocol.acl" class="com.ettrema.http.acl.ACLProtocol">
+        <constructor-arg ref="protocol.webdav"/>
     </bean>
 
     <bean id="protocol.handlers" class="com.bradmcevoy.http.ProtocolHandlers">
@@ -88,6 +75,7 @@
                 <ref bean="protocol.http11"/>
                 <ref bean="protocol.webdav"/>
                 <ref bean="protocol.caldav"/>
+                <ref bean="protocol.acl"/>
             </list>
         </constructor-arg>
     </bean>

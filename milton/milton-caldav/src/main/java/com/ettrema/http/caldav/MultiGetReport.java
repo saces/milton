@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MultiGetReport implements Report {
 
-    private static final Logger log = LoggerFactory.getLogger( PropFindHandler.class );
+    private static final Logger log = LoggerFactory.getLogger( MultiGetReport.class );
     private final ResourceFactory resourceFactory;
     private final PropFindPropertyBuilder propertyBuilder;
     private final PropFindXmlGenerator xmlGenerator;

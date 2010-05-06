@@ -10,7 +10,6 @@ import com.bradmcevoy.property.PropertySource.PropertyMetaData;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -47,16 +46,7 @@ public class PropFindPropertyBuilder {
      */
     public PropFindPropertyBuilder( List<PropertySource> propertySources ) {
         this.propertySources = propertySources;
-    }
-
-    /**
-     * Convenience contructor which initialised this class with a list
-     * of property sources containing only the given source.
-     *
-     * @param propertySource
-     */
-    public PropFindPropertyBuilder( PropertySource propertySource ) {
-        this.propertySources = Arrays.asList( propertySource );
+        log.debug( "num property sources: " + propertySources.size());
     }
 
     /**
@@ -77,6 +67,7 @@ public class PropFindPropertyBuilder {
     }
 
     public ValueAndType getProperty(QName field, Resource resource) {
+        log.debug( "num property sources: " + propertySources.size());
         for( PropertySource source : propertySources ) {
             PropertyMetaData meta = source.getPropertyMetaData( field, resource );
             if( meta != null && !meta.isUnknown() ) {

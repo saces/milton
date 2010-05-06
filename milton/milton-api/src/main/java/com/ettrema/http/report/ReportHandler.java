@@ -13,10 +13,9 @@ import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 import com.bradmcevoy.http.webdav.WebDavResponseHandler;
 import com.bradmcevoy.io.ReadingException;
 import com.bradmcevoy.io.WritingException;
-import com.ettrema.http.ReportableResource;
+import com.bradmcevoy.http.ReportableResource;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import org.jdom.JDOMException;
@@ -33,18 +32,11 @@ public class ReportHandler implements ExistingEntityHandler {
     private final WebDavResponseHandler responseHandler;
     private final ResourceHandlerHelper resourceHandlerHelper;
     private final Map<String,Report> reports;
-    private final String reportNames;
 
-    public ReportHandler( WebDavResponseHandler responseHandler, ResourceHandlerHelper resourceHandlerHelper, List<Report> reports ) {
+    public ReportHandler( WebDavResponseHandler responseHandler, ResourceHandlerHelper resourceHandlerHelper, Map<String,Report> reports ) {
         this.responseHandler = responseHandler;
         this.resourceHandlerHelper = resourceHandlerHelper;
-        this.reports = new HashMap<String, Report>();
-        String s = "";
-        for( Report r : reports ) {
-            this.reports.put( r.getName(), r);
-            s += r.getName() + ",";
-        }
-        this.reportNames = s;
+        this.reports = reports;
     }
 
 
@@ -66,7 +58,7 @@ public class ReportHandler implements ExistingEntityHandler {
             String reportName = doc.getRootElement().getName();
             Report r = reports.get( reportName);
             if( r == null ) {
-                log.error( "report not known: " + reportName + "  I only know about these reports: " + reportNames);
+                log.error( "report not known: " + reportName );
                 throw new BadRequestException( resource );
             } else {
                 String xml = r.process( request.getHostHeader(), resource, doc );

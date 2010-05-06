@@ -28,7 +28,7 @@ public class CalendarResourceTypeHelper implements ResourceTypeHelper {
         List<QName> list = wrapped.getResourceTypes( r );
         if( r instanceof CalendarResource ) {            
             // http://greenbytes.de/tech/webdav/draft-dusseault-caldav-04.html#new-resources
-            QName qn = new QName( CalDavPropertySource.CALDAV_NS, "calendar");
+            QName qn = new QName( CalDavProtocol.CALDAV_NS, "calendar");
             log.debug( "is a calendar, added: " + qn);
             if( list == null ) {
                 list = new ArrayList<QName>();

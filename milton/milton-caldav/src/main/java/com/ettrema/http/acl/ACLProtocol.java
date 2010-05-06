@@ -1,5 +1,7 @@
 package com.ettrema.http.acl;
 
+import com.bradmcevoy.http.Handler;
+import com.bradmcevoy.http.HttpExtension;
 import com.bradmcevoy.http.PropFindableResource;
 import com.bradmcevoy.http.Resource;
 import com.bradmcevoy.http.webdav.PropertyMap;
@@ -8,7 +10,9 @@ import com.bradmcevoy.http.webdav.WebDavProtocol;
 import com.bradmcevoy.property.PropertySource;
 import com.ettrema.http.AccessControlledResource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import javax.xml.namespace.QName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,15 +21,27 @@ import org.slf4j.LoggerFactory;
  *
  * @author brad
  */
-public class ACLPropertySource implements PropertySource {
+public class ACLProtocol implements HttpExtension, PropertySource {
 
-    private static final Logger log = LoggerFactory.getLogger( ACLPropertySource.class );
+    private static final Logger log = LoggerFactory.getLogger( ACLProtocol.class );
     private final PropertyMap propertyMap;
 
-    public ACLPropertySource() {
+    public ACLProtocol(WebDavProtocol webDavProtocol) {
         propertyMap = new PropertyMap( WebDavProtocol.NS_DAV );
         propertyMap.add( new PrincipalUrl() );
+        log.debug( "registering the ACLProtocol as a property source");
+        webDavProtocol.addPropertySource( this );
     }
+
+    /**
+     * No methods currently defined
+     * 
+     * @return
+     */
+    public Set<Handler> getHandlers() {
+        return Collections.EMPTY_SET;
+    }
+
 
     public Object getProperty( QName name, Resource r ) {
         log.debug( "getProperty: " + name.getLocalPart() );
@@ -74,4 +90,5 @@ public class ACLPropertySource implements PropertySource {
             return String.class;
         }
     }
+
 }
