@@ -7,7 +7,7 @@ import com.bradmcevoy.http.ResourceFactory;
 public class TResourceFactory implements ResourceFactory {
 
     private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger( TResourceFactory.class );
-    public static final TFolderResource ROOT = new TFolderResource( (TFolderResource) null, "localhost:8084/milton-caldav-demo-1.5.0.1-SNAPSHOT" );
+    public static final TFolderResource ROOT = new TFolderResource( (TFolderResource) null, "http://localhost:7080/caldavdemo" );
 
     static {
         TFolderResource folder = new TFolderResource( ROOT, "folder1" );
