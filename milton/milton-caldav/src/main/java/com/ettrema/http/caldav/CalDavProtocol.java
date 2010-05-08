@@ -160,7 +160,7 @@ public class CalDavProtocol implements HttpExtension, PropertySource {
         }
 
         public String getValue( PropFindableResource res ) {
-            return "http://localhost:8100/caldavdemo/folder1/cal1";
+            return "http://localhost:7080/caldavdemo/folder1/cal1";
         }
 
         public Class<String> getValueClass() {
@@ -211,7 +211,7 @@ public class CalDavProtocol implements HttpExtension, PropertySource {
         }
 
         public String getValue( PropFindableResource res ) {
-            return "http://localhost:8100/caldavdemo/folder1/cal1";
+            return "http://localhost:7080/caldavdemo/folder1/cal1";
         }
 
         public Class<String> getValueClass() {
@@ -226,7 +226,7 @@ public class CalDavProtocol implements HttpExtension, PropertySource {
         }
 
         public String getValue( PropFindableResource res ) {
-            return "http://localhost:8100/caldavdemo/folder1/cal1";
+            return "http://localhost:7080/caldavdemo/folder1/cal1";
         }
 
         public Class<String> getValueClass() {
@@ -295,7 +295,7 @@ public class CalDavProtocol implements HttpExtension, PropertySource {
         }
 
         public String getValue( PropFindableResource res ) {
-            return "http://localhost:8100/caldavdemo/folder1/cal1";
+            return "http://localhost:7080/caldavdemo/folder1/cal1";
         }
 
         public Class<String> getValueClass() {
