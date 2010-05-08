@@ -18,6 +18,7 @@ import com.bradmcevoy.http.XmlWriter;
 import com.bradmcevoy.http.http11.DefaultHttp11ResponseHandler;
 import com.bradmcevoy.http.quota.DefaultQuotaDataAccessor;
 import com.bradmcevoy.http.quota.QuotaDataAccessor;
+import com.bradmcevoy.http.values.PrincipalCollectionSetList;
 import com.bradmcevoy.http.values.SupportedReportSetList;
 import com.bradmcevoy.http.values.ValueWriters;
 import com.bradmcevoy.http.webdav.PropertyMap.StandardProperty;
@@ -63,17 +64,21 @@ public class WebDavProtocol implements HttpExtension, PropertySource {
 //    }
     public WebDavProtocol( WebDavResponseHandler responseHandler, HandlerHelper handlerHelper ) {
         this( responseHandler, handlerHelper, new WebDavResourceTypeHelper() );
+        log.info( "DefaultWebDavPropertySource constructor 1");
     }
 
     public WebDavProtocol( WebDavResponseHandler responseHandler, HandlerHelper handlerHelper, ResourceTypeHelper resourceTypeHelper ) {
         this( handlerHelper, resourceTypeHelper, responseHandler, PropertySourceUtil.createDefaultSources( resourceTypeHelper ) );
+        log.info( "DefaultWebDavPropertySource constructor 2");
     }
 
     public WebDavProtocol( HandlerHelper handlerHelper, ResourceTypeHelper resourceTypeHelper, WebDavResponseHandler responseHandler, List<PropertySource> extraPropertySources ) {
         this( handlerHelper, resourceTypeHelper, responseHandler, extraPropertySources, new DefaultQuotaDataAccessor() );
+        log.info( "DefaultWebDavPropertySource constructor 3");
     }
 
     public WebDavProtocol( HandlerHelper handlerHelper, ResourceTypeHelper resourceTypeHelper, WebDavResponseHandler responseHandler, List<PropertySource> extraPropertySources, QuotaDataAccessor quotaDataAccessor ) {
+        log.info( "DefaultWebDavPropertySource constructor 4");
         handlers = new HashSet<Handler>();
         this.resourceTypeHelper = resourceTypeHelper;
         this.quotaDataAccessor = quotaDataAccessor;
@@ -98,6 +103,9 @@ public class WebDavProtocol implements HttpExtension, PropertySource {
 
         propertyMap.add( new QuotaAvailableBytesPropertyWriter() );
         propertyMap.add( new QuotaUsedBytesPropertyWriter() );
+
+        propertyMap.add( new PrincipalCollectionSetPropertyWriter() );
+        propertyMap.add( new SupportedReportSetProperty() );
 
         ResourceHandlerHelper resourceHandlerHelper = new ResourceHandlerHelper( handlerHelper, responseHandler );
 
@@ -153,19 +161,26 @@ public class WebDavProtocol implements HttpExtension, PropertySource {
     }
 
     public Object getProperty( QName name, Resource r ) {
-        return propertyMap.getProperty( name, r );
+        log.debug( "getProperty: " + name.getLocalPart() );
+        Object o = propertyMap.getProperty( name, r );
+        log.debug( "Property Result : "+o );
+        return o;
     }
 
     public void setProperty( QName name, Object value, Resource r ) {
+        log.debug( "setProperty: " + name.getLocalPart() );
         throw new UnsupportedOperationException( "Not supported. Standard webdav properties are not writable" );
     }
 
     public PropertyMetaData getPropertyMetaData( QName name, Resource r ) {
         log.debug( "getPropertyMetaData: " + name.getLocalPart() );
-        return propertyMap.getPropertyMetaData( name, r );
+        PropertyMetaData propertyMetaData= propertyMap.getPropertyMetaData( name, r );
+        log.debug( "PropertyMetaData Result : "+propertyMetaData );
+        return propertyMetaData;
     }
 
     public void clearProperty( QName name, Resource r ) {
+        log.debug( "clearProperty: " + name.getLocalPart() );
         throw new UnsupportedOperationException( "Not supported. Standard webdav properties are not writable" );
     }
 
@@ -400,6 +415,25 @@ public class WebDavProtocol implements HttpExtension, PropertySource {
         }
     }
 
+
+    class PrincipalCollectionSetPropertyWriter implements StandardProperty<PrincipalCollectionSetList> {
+
+        @Override
+        public String fieldName() {
+            return "principal-collection-set";
+        }
+
+        public PrincipalCollectionSetList getValue( PropFindableResource res ) {
+            PrincipalCollectionSetList principalCollectionSet = new PrincipalCollectionSetList();
+            principalCollectionSet.add("http://localhost:7080/caldavdemo/folder1/cal1");
+            return principalCollectionSet;
+        }
+
+        public Class getValueClass() {
+            return PrincipalCollectionSetList.class;
+        }
+    }
+
     class SupportedReportSetProperty implements StandardProperty<SupportedReportSetList> {
 
         public String fieldName() {
@@ -407,7 +441,11 @@ public class WebDavProtocol implements HttpExtension, PropertySource {
         }
 
         public SupportedReportSetList getValue( PropFindableResource res ) {
-            throw new UnsupportedOperationException( "Not supported yet." );
+            SupportedReportSetList reportSet = new SupportedReportSetList();
+            for (String reportName : reports.keySet()) {
+              reportSet.add(reportName);
+            }
+            return reportSet;
         }
 
         public Class getValueClass() {
