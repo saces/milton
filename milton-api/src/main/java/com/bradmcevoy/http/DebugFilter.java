@@ -13,17 +13,14 @@ import java.util.Map;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.bradmcevoy.io.StreamUtils;
+
+import freenet.log.Logger;
 
 /**
  *
  */
 public class DebugFilter implements Filter{
-
-    private static final Logger log = LoggerFactory.getLogger(DebugFilter.class);
 
     private static int counter = 0;
 
@@ -31,12 +28,12 @@ public class DebugFilter implements Filter{
 
     public DebugFilter() {
         logDir = new File(System.getProperty("user.home"));
-        log.debug( "logging to: " + logDir.getAbsolutePath());
+        Logger.debug(this, "logging to: " + logDir.getAbsolutePath());
     }
 
     public DebugFilter( File logDir ) {
         this.logDir = logDir;
-        log.debug( "logging to: " + logDir.getAbsolutePath());
+        Logger.debug(this, "logging to: " + logDir.getAbsolutePath());
     }
 
 
@@ -50,7 +47,7 @@ public class DebugFilter implements Filter{
             response.getOutputStream().write(resp2.out.toByteArray());
             response.getOutputStream().flush();
         } catch (IOException ex) {
-            log.error("", ex);
+            Logger.error(this, "", ex);
         }
     }
 
@@ -130,12 +127,12 @@ public class DebugFilter implements Filter{
                 writer.flush();
                 
                 // write to console
-                log.debug( out.toString());
+                Logger.debug(this, out.toString());
 
                 fout.write(out.toByteArray());
                 fout.flush();
             } catch (IOException ex) {
-                log.error("",ex);
+                Logger.error(this, "",ex);
             }
         }
 
@@ -170,7 +167,7 @@ public class DebugFilter implements Filter{
             }
             this.contentBytes = out.toByteArray();
             this.content = new ByteArrayInputStream(this.contentBytes);
-            log.debug(out.toString());
+            Logger.debug(this, out.toString());
         }
 
         public Map<String, String> getHeaders() {
@@ -216,7 +213,7 @@ public class DebugFilter implements Filter{
             try {
                 out.write(contentBytes);
             } catch (IOException ex) {
-                log.error("",ex);
+                Logger.error(this, "",ex);
             }
         }
 

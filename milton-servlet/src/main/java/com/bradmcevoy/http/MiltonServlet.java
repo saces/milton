@@ -1,6 +1,9 @@
 package com.bradmcevoy.http;
 
 import com.bradmcevoy.http.webdav.WebDavResponseHandler;
+
+import freenet.log.Logger;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,9 +12,6 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
  */
 public class MiltonServlet implements Servlet {
 
-    private Logger log = LoggerFactory.getLogger( MiltonServlet.class );
     private static final ThreadLocal<HttpServletRequest> originalRequest = new ThreadLocal<HttpServletRequest>();
     private static final ThreadLocal<HttpServletResponse> originalResponse = new ThreadLocal<HttpServletResponse>();
     private static final ThreadLocal<ServletConfig> tlServletConfig = new ThreadLocal<ServletConfig>();
@@ -76,16 +75,16 @@ public class MiltonServlet implements Servlet {
             }
             httpManager.init( new ApplicationConfig( config ), httpManager );
         } catch( ServletException ex ) {
-            log.error( "Exception starting milton servlet", ex );
+            Logger.error(this, "Exception starting milton servlet", ex );
             throw ex;
         } catch( Throwable ex ) {
-            log.error( "Exception starting milton servlet", ex );
+            Logger.error(this, "Exception starting milton servlet", ex );
             throw new RuntimeException( ex );
         }
     }
 
     protected void init( String resourceFactoryClassName, String responseHandlerClassName, List<String> authHandlers ) throws ServletException {
-        log.debug( "resourceFactoryClassName: " + resourceFactoryClassName );
+        Logger.debug(this, "resourceFactoryClassName: " + resourceFactoryClassName );
         ResourceFactory rf = instantiate( resourceFactoryClassName );
         WebDavResponseHandler responseHandler;
         if( responseHandlerClassName == null ) {
@@ -97,7 +96,7 @@ public class MiltonServlet implements Servlet {
     }
 
     protected void initFromFactoryFactory( String resourceFactoryFactoryClassName, List<String> authHandlers ) throws ServletException {
-        log.debug( "resourceFactoryFactoryClassName: " + resourceFactoryFactoryClassName );
+        Logger.debug(this, "resourceFactoryFactoryClassName: " + resourceFactoryFactoryClassName );
         ResourceFactoryFactory rff = instantiate( resourceFactoryFactoryClassName );
         rff.init();
         ResourceFactory rf = rff.createResourceFactory();
@@ -124,13 +123,13 @@ public class MiltonServlet implements Servlet {
         }
 
         // log the auth handler config
-        log.debug( "Configured authentication handlers: " + authService.getAuthenticationHandlers().size());
+        Logger.debug(this, "Configured authentication handlers: " + authService.getAuthenticationHandlers().size());
         if( authService.getAuthenticationHandlers().size() > 0 ) {
             for( AuthenticationHandler hnd : authService.getAuthenticationHandlers()) {
-                log.debug( " - " + hnd.getClass().getCanonicalName());
+                Logger.debug(this, " - " + hnd.getClass().getCanonicalName());
             }
         } else {
-            log.warn("No authentication handlers are configured! Any requests requiring authorisation will fail.");
+            Logger.warning(this, "No authentication handlers are configured! Any requests requiring authorisation will fail.");
         }
 
 
@@ -152,7 +151,7 @@ public class MiltonServlet implements Servlet {
     }
 
     public void destroy() {
-        log.debug( "destroy" );
+        Logger.debug(this, "destroy" );
         if( httpManager == null ) return;
         httpManager.destroy( httpManager );
     }

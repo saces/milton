@@ -2,12 +2,13 @@ package com.bradmcevoy.http.http11.auth;
 
 import com.bradmcevoy.http.Request;
 import com.bradmcevoy.http.Resource;
+
+import freenet.log.Logger;
+
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A very simple nonce provide that users a map to store issued nonces.
@@ -25,7 +26,6 @@ import org.slf4j.LoggerFactory;
  */
 public class SimpleMemoryNonceProvider implements NonceProvider {
 
-    private static final Logger log = LoggerFactory.getLogger( SimpleMemoryNonceProvider.class );
     private final int nonceValiditySeconds;
     private Map<UUID, Nonce> nonces;
     private final ExpiredNonceRemover remover;
@@ -37,7 +37,7 @@ public class SimpleMemoryNonceProvider implements NonceProvider {
         this.nonces = new ConcurrentHashMap<UUID, Nonce>();
         this.nonceValiditySeconds = nonceValiditySeconds;
         this.remover = new ExpiredNonceRemover( nonces, nonceValiditySeconds );
-        log.debug( "created" );
+        Logger.debug(this, "created" );
     }
 
     public SimpleMemoryNonceProvider( int nonceValiditySeconds, ExpiredNonceRemover remover ) {
@@ -69,32 +69,32 @@ public class SimpleMemoryNonceProvider implements NonceProvider {
     }
 
     public NonceValidity getNonceValidity( String nonce, Long nc ) {
-        log.debug( "getNonceValidity: " + nonce );
+        Logger.debug(this, "getNonceValidity: " + nonce );
         UUID value = null;
         try {
             value = UUID.fromString( nonce );
         } catch( Exception e ) {
-            log.debug( "couldnt parse nonce" );
+            Logger.debug(this, "couldnt parse nonce" );
             return NonceValidity.INVALID;
         }
         Nonce n = nonces.get( value );
         if( n == null ) {
-            log.debug( "not found in map of size: " + nonces.size() );
+            Logger.debug(this, "not found in map of size: " + nonces.size() );
             return NonceValidity.INVALID;
         } else {
             if( isExpired( n.getIssued() ) ) {
-                log.debug( "nonce has expired" );
+                Logger.debug(this, "nonce has expired" );
                 return NonceValidity.EXPIRED;
             } else {
                 if( nc == null ) {
-                    log.debug( "nonce ok" );
+                    Logger.debug(this, "nonce ok" );
                     return NonceValidity.OK;
                 } else {
                     if( enableNonceCountChecking && nc <= n.getNonceCount() ) {
-                        log.warn( "nonce-count was not greater then previous, possible replay attack. new: " + nc + " old:" + n.getNonceCount() );
+                        Logger.warning(this, "nonce-count was not greater then previous, possible replay attack. new: " + nc + " old:" + n.getNonceCount() );
                         return NonceValidity.INVALID;
                     } else {
-                        log.debug( "nonce and nonce-count ok" );
+                        Logger.debug(this, "nonce and nonce-count ok" );
                         Nonce newNonce = n.increaseNonceCount( nc );
                         nonces.put( newNonce.getValue(), newNonce );
                         return NonceValidity.OK;

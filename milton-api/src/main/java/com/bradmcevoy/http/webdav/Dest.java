@@ -1,7 +1,6 @@
 package com.bradmcevoy.http.webdav;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import freenet.log.Logger;
 
 /**
  * 
@@ -13,9 +12,7 @@ import org.slf4j.LoggerFactory;
  * to make it easier to differentiate between the name and folder of the destination
  */
 class Dest {
-    
-    private static final Logger log = LoggerFactory.getLogger(Dest.class);
-    
+
     public final String host;
     
     /**
@@ -31,7 +28,7 @@ class Dest {
     
     
     public Dest(String sourceHost, String sDest ) {
-        log.debug("sDest: " + sDest);
+        Logger.debug(this, "sDest: " + sDest);
         String sUrl;
         if( sDest.endsWith("/") ) sDest = sDest.substring(0,sDest.length()-1);
         if( sDest.contains("http://") ) {

@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import freenet.log.Logger;
 
 import static java.util.concurrent.TimeUnit.*;
 
@@ -21,8 +21,6 @@ import static java.util.concurrent.TimeUnit.*;
  */
 public class ExpiredNonceRemover implements Runnable {
 
-    private static final Logger log = LoggerFactory.getLogger( ExpiredNonceRemover.class );
-
     private static final int INTERVAL = 10;
 
     private final Map<UUID, Nonce> nonces;
@@ -32,7 +30,7 @@ public class ExpiredNonceRemover implements Runnable {
     public ExpiredNonceRemover( Map<UUID, Nonce> nonces, int nonceValiditySeconds ) {
         this.nonces = nonces;
         this.nonceValiditySeconds = nonceValiditySeconds;
-        log.debug( "scheduling checks for expired nonces every " + INTERVAL + " seconds");
+        Logger.debug(this, "scheduling checks for expired nonces every " + INTERVAL + " seconds");
         scheduler = Executors.newScheduledThreadPool( 1 );
         scheduler.scheduleAtFixedRate( this, 10, INTERVAL, SECONDS );
     }
@@ -43,7 +41,7 @@ public class ExpiredNonceRemover implements Runnable {
             UUID key = it.next();
             Nonce n = nonces.get( key );
             if( isExpired( n.getIssued())) {
-                log.debug( "removing expired nonce: " + key);
+                Logger.debug(this, "removing expired nonce: " + key);
                 it.remove();
             }
         }

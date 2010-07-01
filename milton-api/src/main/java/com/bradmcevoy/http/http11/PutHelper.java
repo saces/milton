@@ -11,18 +11,17 @@ import com.bradmcevoy.http.Resource;
 import com.bradmcevoy.http.exceptions.BadRequestException;
 import com.bradmcevoy.http.exceptions.ConflictException;
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
+
+import freenet.log.Logger;
+
 import java.io.IOException;
 import java.io.OutputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A collection of utility methods for PutHandler
  *
  */
 public class PutHelper {
-
-    private static final Logger log = LoggerFactory.getLogger( PutHelper.class );
 
     /**
      * Largly copied from tomcat
@@ -45,7 +44,7 @@ public class PutHelper {
 
         // bytes is the only range unit supported
         if (!rangeHeader.startsWith("bytes")) {
-            log.warn("Invalid range header, does not start with 'bytes': " + rangeHeader);
+            Logger.warning(this, "Invalid range header, does not start with 'bytes': " + rangeHeader);
             throw new BadRequestException(r);
         }
 
@@ -55,12 +54,12 @@ public class PutHelper {
         int slashPos = rangeHeader.indexOf('/');
 
         if (dashPos == -1) {
-            log.warn("Invalid range header, dash not found: " + rangeHeader);
+            Logger.warning(this, "Invalid range header, dash not found: " + rangeHeader);
             throw new BadRequestException(r);
         }
 
         if (slashPos == -1) {
-            log.warn("Invalid range header, slash not found: " + rangeHeader);
+            Logger.warning(this, "Invalid range header, slash not found: " + rangeHeader);
             throw new BadRequestException(r);
         }
 
@@ -72,7 +71,7 @@ public class PutHelper {
         try {
             start = Long.parseLong(s);
         } catch (NumberFormatException e) {
-            log.warn("Invalid range header, start is not a valid number: " + s + " Raw header:" + rangeHeader);
+            Logger.warning(this, "Invalid range header, start is not a valid number: " + s + " Raw header:" + rangeHeader);
             throw new BadRequestException(r);
         }
 
@@ -81,7 +80,7 @@ public class PutHelper {
         try {
             finish = Long.parseLong(s);
         } catch (NumberFormatException e) {
-            log.warn("Invalid range header, finish is not a valid number: " + s + " Raw header:" + rangeHeader);
+            Logger.warning(this, "Invalid range header, finish is not a valid number: " + s + " Raw header:" + rangeHeader);
             throw new BadRequestException(r);
         }
 
@@ -97,13 +96,13 @@ public class PutHelper {
 
     private boolean validate(Range r) {
         if( r.getStart() < 0 ) {
-            log.warn("invalid range, start is negative");
+            Logger.warning(this, "invalid range, start is negative");
             return false;
         } else if( r.getFinish() < 0 ) {
-            log.warn("invalid range, finish is negative");
+            Logger.warning(this, "invalid range, finish is negative");
             return false;
         } else if( r.getStart() > r.getFinish()) {
-            log.warn("invalid range, start is greater then finish");
+            Logger.warning(this, "invalid range, start is greater then finish");
             return false;
         } else {
             return true;
@@ -116,7 +115,7 @@ public class PutHelper {
         if( l == null ) {
             String s = request.getRequestHeader( Request.Header.X_EXPECTED_ENTITY_LENGTH );
             if( s != null && s.length() > 0 ) {
-                log.debug( "no content-length given, but founhd non-standard length header: " + s );
+                Logger.debug(this, "no content-length given, but founhd non-standard length header: " + s );
                 try {
                     l = Long.parseLong( s );
                 } catch( NumberFormatException e ) {
@@ -152,7 +151,7 @@ public class PutHelper {
             if( thisResource instanceof CollectionResource ) {
                 return (CollectionResource) thisResource;
             } else {
-                log.warn( "parent is not a collection: " + path );
+                Logger.warning(this, "parent is not a collection: " + path );
                 return null;
             }
         }

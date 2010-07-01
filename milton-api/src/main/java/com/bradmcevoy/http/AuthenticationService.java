@@ -3,12 +3,13 @@ package com.bradmcevoy.http;
 import com.bradmcevoy.http.http11.auth.BasicAuthHandler;
 import com.bradmcevoy.http.http11.auth.DigestAuthenticationHandler;
 import com.bradmcevoy.http.http11.auth.NonceProvider;
+
+import freenet.log.Logger;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -16,7 +17,6 @@ import org.slf4j.LoggerFactory;
  */
 public class AuthenticationService {
 
-    private static final Logger log = LoggerFactory.getLogger( AuthenticationService.class );
     private List<AuthenticationHandler> authenticationHandlers;
     private boolean disableBasic;
     private boolean disableDigest;
@@ -110,12 +110,12 @@ public class AuthenticationService {
             if( h.supports( resource, request ) ) {
                 Object o = h.authenticate( resource, request );
                 if( o == null ) {
-                    log.warn( "authentication failed by AuthenticationHandler:" + h.getClass() );
+                    Logger.warning(this, "authentication failed by AuthenticationHandler:" + h.getClass() );
                 }
                 return o;
             }
         }
-        log.warn( "No AuthenticationHandler supports scheme:" + request.getAuthorization().getScheme() + " and resource type: " + resource.getClass() );
+        Logger.warning(this, "No AuthenticationHandler supports scheme:" + request.getAuthorization().getScheme() + " and resource type: " + resource.getClass() );
         return null;
     }
 
@@ -131,11 +131,11 @@ public class AuthenticationService {
         List<String> challenges = new ArrayList<String>();
         for( AuthenticationHandler h : authenticationHandlers ) {
             if( h.isCompatible( resource ) ) {
-                log.debug( "challenge for auth: " + h.getClass() );
+                Logger.debug(this, "challenge for auth: " + h.getClass() );
                 String ch = h.getChallenge( resource, request );
                 challenges.add( ch );
             } else {
-                log.debug( "not challenging for auth: " + h.getClass() + " for resource type: " + resource.getClass() );
+                Logger.debug(this, "not challenging for auth: " + h.getClass() + " for resource type: " + resource.getClass() );
             }
         }
         return challenges;

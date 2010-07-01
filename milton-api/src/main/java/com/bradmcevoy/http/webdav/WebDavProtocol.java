@@ -24,6 +24,9 @@ import com.bradmcevoy.http.values.ValueWriters;
 import com.bradmcevoy.http.webdav.PropertyMap.StandardProperty;
 import com.ettrema.http.report.Report;
 import com.ettrema.http.report.ReportHandler;
+
+import freenet.log.Logger;
+
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,8 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.xml.namespace.QName;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Defines the methods and properties that make up the webdav protocol.
@@ -48,7 +49,6 @@ import org.slf4j.LoggerFactory;
  */
 public class WebDavProtocol implements HttpExtension, PropertySource {
 
-    private static final Logger log = LoggerFactory.getLogger( WebDavProtocol.class );
     public static final String NS_DAV = "DAV:";
     private final Set<Handler> handlers;
     private final Map<String, Report> reports;
@@ -85,8 +85,8 @@ public class WebDavProtocol implements HttpExtension, PropertySource {
         this.quotaDataAccessor = quotaDataAccessor;
         this.propertyMap = new PropertyMap( WebDavProtocol.NS_DAV );
 
-        log.info( "resourceTypeHelper: " + resourceTypeHelper.getClass() );
-        log.info( "quotaDataAccessor: " + quotaDataAccessor.getClass() );
+        Logger.normal(this, "resourceTypeHelper: " + resourceTypeHelper.getClass() );
+        Logger.normal(this, "quotaDataAccessor: " + quotaDataAccessor.getClass() );
         propertyMap.add( new ContentLengthPropertyWriter() );
         propertyMap.add( new ContentTypePropertyWriter() );
         propertyMap.add( new CreationDatePropertyWriter() );
@@ -115,13 +115,13 @@ public class WebDavProtocol implements HttpExtension, PropertySource {
         // and here
         ValueWriters valueWriters = new ValueWriters();
 
-        log.debug( "provided property sources: " + propertySources.size() );
+        Logger.debug(this, "provided property sources: " + propertySources.size() );
         this.propertySources = propertySources;
 
-        log.debug( "adding webdav as a property source" );
+        Logger.debug(this, "adding webdav as a property source" );
         addPropertySource( this );
         if( patchSetter == null ) {
-            log.info("creating default patcheSetter: " + PropertySourcePatchSetter.class);
+            Logger.normal(this, "creating default patcheSetter: " + PropertySourcePatchSetter.class);
             patchSetter = new PropertySourcePatchSetter( propertySources, valueWriters );
         }
         handlers.add( new PropFindHandler( resourceHandlerHelper, resourceTypeHelper, responseHandler, propertySources ) );
@@ -143,7 +143,7 @@ public class WebDavProtocol implements HttpExtension, PropertySource {
 
     public void addPropertySource( PropertySource ps ) {
         propertySources.add( ps );
-        log.debug( "adding property source: " + ps.getClass() + " new size: " + propertySources.size() );
+        Logger.debug(this, "adding property source: " + ps.getClass() + " new size: " + propertySources.size() );
     }
 
     public void addReport( Report report ) {
@@ -232,7 +232,7 @@ public class WebDavProtocol implements HttpExtension, PropertySource {
     class ResourceTypePropertyWriter implements StandardProperty<List<QName>> {
 
         public List<QName> getValue( PropFindableResource res ) {
-            log.trace( "ResourceTypePropertyWriter:getValue" );
+            Logger.debug(this, "ResourceTypePropertyWriter:getValue" );
             return resourceTypeHelper.getResourceTypes( res );
         }
 

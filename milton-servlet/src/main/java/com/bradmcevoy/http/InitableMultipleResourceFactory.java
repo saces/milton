@@ -1,16 +1,14 @@
 package com.bradmcevoy.http;
 
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import freenet.log.Logger;
 
 /**
  *
  * @author brad
  */
 public class InitableMultipleResourceFactory extends MultipleResourceFactory {
-
-    private Logger log = LoggerFactory.getLogger(InitableMultipleResourceFactory.class);
 
     public InitableMultipleResourceFactory() {
         super();
@@ -27,7 +25,7 @@ public class InitableMultipleResourceFactory extends MultipleResourceFactory {
 
 
     protected void init(String sFactories,ApplicationConfig config, HttpManager manager) {
-        log.debug("init: " + sFactories );
+        Logger.debug(this, "init: " + sFactories );
         String[] arr = sFactories.split(",");
         for(String s : arr ) {
             createFactory(s,config,manager);
@@ -35,7 +33,7 @@ public class InitableMultipleResourceFactory extends MultipleResourceFactory {
     }
 
     private void createFactory(String s,ApplicationConfig config, HttpManager manager) {
-        log.debug("createFactory: " + s);
+        Logger.debug(this, "createFactory: " + s);
         Class c;
         try {
             c = Class.forName(s);
@@ -61,7 +59,7 @@ public class InitableMultipleResourceFactory extends MultipleResourceFactory {
 
     public void destroy(HttpManager manager) {
         if( factories == null ) {
-            log.warn("factories is null");
+            Logger.warning(this, "factories is null");
             return ;
         }
         for( ResourceFactory f : factories ) {

@@ -11,9 +11,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.bradmcevoy.http.Request.Method;
 import com.bradmcevoy.io.ReadingException;
 import com.bradmcevoy.io.WritingException;
@@ -90,8 +87,6 @@ Content-Length: xxxx
  * @author brad
  */
 public class PropPatchHandler implements ExistingEntityHandler {
-
-    private final static Logger log = LoggerFactory.getLogger( PropPatchHandler.class );
 
     private final ResourceHandlerHelper resourceHandlerHelper;
 

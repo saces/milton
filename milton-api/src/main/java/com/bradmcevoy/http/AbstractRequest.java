@@ -4,12 +4,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import freenet.log.Logger;
 
 public abstract class AbstractRequest implements Request {
 
-    private Logger log = LoggerFactory.getLogger( AbstractRequest.class );
     public static final int INFINITY = 3; // To limit tree browsing a bit
 
     public abstract String getRequestHeader( Request.Header header );
@@ -22,7 +20,7 @@ public abstract class AbstractRequest implements Request {
         try {
             return DateUtils.parseDate( s );
         } catch( DateUtils.DateParseException ex ) {
-            log.error( "Unable to parse date: " + s, ex );
+            Logger.error(this, "Unable to parse date: " + s, ex );
             return null;
         }
     }
@@ -59,7 +57,7 @@ public abstract class AbstractRequest implements Request {
             } else if( depthStr.equals( "infinity" ) ) {
                 return INFINITY;
             } else {
-                log.warn( "Unknown depth value: " + depthStr );
+                Logger.warning(this, "Unknown depth value: " + depthStr );
                 return INFINITY;
             }
         }
@@ -80,7 +78,7 @@ public abstract class AbstractRequest implements Request {
             long l = Long.parseLong( s );
             return l;
         } catch( NumberFormatException ex ) {
-            log.warn( "Couldnt parse content length header: " + s );
+            Logger.warning(this, "Couldnt parse content length header: " + s );
             return null;
         }
     }

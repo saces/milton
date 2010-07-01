@@ -6,12 +6,13 @@ import com.bradmcevoy.http.LockTimeout;
 import com.bradmcevoy.http.LockToken;
 import com.bradmcevoy.http.LockableResource;
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
+
+import freenet.log.Logger;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Keys on getUniqueID of the locked resource.
@@ -19,7 +20,6 @@ import org.slf4j.LoggerFactory;
  */
 public class SimpleLockManager implements LockManager {
 
-    private static final Logger log = LoggerFactory.getLogger( SimpleLockManager.class );
     /**
      * maps current locks by the file associated with the resource
      */
@@ -53,7 +53,7 @@ public class SimpleLockManager implements LockManager {
     public synchronized void unlock( String tokenId, LockableResource r ) throws NotAuthorizedException {
         LockToken lockToken = currentLock( r );
         if( lockToken == null ) {
-            log.debug( "not locked" );
+            Logger.debug(this, "not locked" );
             return;
         }
         if( lockToken.tokenId.equals( tokenId ) ) {
@@ -76,13 +76,13 @@ public class SimpleLockManager implements LockManager {
     }
 
     private void removeLock( LockToken token ) {
-        log.debug( "removeLock: " + token.tokenId );
+        Logger.debug(this, "removeLock: " + token.tokenId );
         CurrentLock currentLock = locksByToken.get( token.tokenId );
         if( currentLock != null ) {
             locksByUniqueId.remove( currentLock.id );
             locksByToken.remove( currentLock.token.tokenId );
         } else {
-            log.warn( "couldnt find lock: " + token.tokenId );
+            Logger.warning(this, "couldnt find lock: " + token.tokenId );
         }
     }
 

@@ -19,13 +19,13 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import com.bradmcevoy.http.Response.ContentType;
 import com.bradmcevoy.http.upload.MonitoredDiskFileItemFactory;
 import com.bradmcevoy.http.upload.UploadListener;
+
+import freenet.log.Logger;
+
 import java.util.ArrayList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ServletRequest extends AbstractRequest {
 
-    private static final Logger log = LoggerFactory.getLogger( ServletRequest.class );
     private final HttpServletRequest request;
     private final Request.Method method;
     private final String url;
@@ -52,7 +52,7 @@ public class ServletRequest extends AbstractRequest {
         String sMethod = r.getMethod();
         method = Request.Method.valueOf( sMethod );
         url = r.getRequestURL().toString(); //MiltonUtils.stripContext(r);
-        log.debug( "url: " + url );
+        Logger.debug(this, "url: " + url );
         tlRequest.set( r );
     }
 
@@ -91,10 +91,10 @@ public class ServletRequest extends AbstractRequest {
     }
 
     public void parseRequestParameters( Map<String, String> params, Map<String, com.bradmcevoy.http.FileItem> files ) throws RequestParseException {
-        log.debug( "parseRequestParameters" );
+        Logger.debug(this, "parseRequestParameters" );
         try {
             if( isMultiPart() ) {
-                log.debug( "..is multi" );
+                Logger.debug(this, "..is multi" );
                 UploadListener listener = new UploadListener();
                 MonitoredDiskFileItemFactory factory = new MonitoredDiskFileItemFactory( listener );
                 ServletFileUpload upload = new ServletFileUpload( factory );
@@ -111,11 +111,11 @@ public class ServletRequest extends AbstractRequest {
                     }
                 }
             } else {
-                log.debug( "..not multi" );
+                Logger.debug(this, "..not multi" );
                 for( Enumeration en = request.getParameterNames(); en.hasMoreElements(); ) {
                     String nm = (String) en.nextElement();
                     String val = request.getParameter( nm );
-                    log.debug( "..param: " + nm + " = " + val );
+                    Logger.debug(this, "..param: " + nm + " = " + val );
                     params.put( nm, val );
                 }
             }

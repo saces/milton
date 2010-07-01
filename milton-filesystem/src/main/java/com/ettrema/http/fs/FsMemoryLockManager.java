@@ -6,20 +6,20 @@ import com.bradmcevoy.http.LockTimeout;
 import com.bradmcevoy.http.LockToken;
 import com.bradmcevoy.http.LockableResource;
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
+
+import freenet.log.Logger;
+
 import java.io.File;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
  */
 public class FsMemoryLockManager implements LockManager {
 
-    private static final Logger log = LoggerFactory.getLogger( FsMemoryLockManager.class );
     /**
      * maps current locks by the file associated with the resource
      */
@@ -55,7 +55,7 @@ public class FsMemoryLockManager implements LockManager {
         FsResource resource = (FsResource) r;
         LockToken lockToken = currentLock( resource );
         if( lockToken == null ) {
-            log.debug( "not locked" );
+            Logger.debug(this, "not locked" );
             return;
         }
         if( lockToken.tokenId.equals( tokenId ) ) {
@@ -78,13 +78,13 @@ public class FsMemoryLockManager implements LockManager {
     }
 
     private void removeLock( LockToken token ) {
-        log.debug( "removeLock: " + token.tokenId );
+        Logger.debug(this, "removeLock: " + token.tokenId );
         CurrentLock currentLock = locksByToken.get( token.tokenId );
         if( currentLock != null ) {
             locksByFile.remove( currentLock.file );
             locksByToken.remove( currentLock.token.tokenId );
         } else {
-            log.warn( "couldnt find lock: " + token.tokenId );
+            Logger.warning(this, "couldnt find lock: " + token.tokenId );
         }
     }
 

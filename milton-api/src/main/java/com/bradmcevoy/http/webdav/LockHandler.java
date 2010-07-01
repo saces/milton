@@ -7,13 +7,13 @@ import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import com.bradmcevoy.common.Path;
 import com.bradmcevoy.http.Request.Method;
 import com.bradmcevoy.http.Response.Status;
+
+import freenet.log.Logger;
 
 /**
  * Note that this is both a new entity handler and an existing entity handler
@@ -22,7 +22,6 @@ import com.bradmcevoy.http.Response.Status;
  */
 public class LockHandler implements ResourceHandler {
 
-    private Logger log = LoggerFactory.getLogger( LockHandler.class );
     private final WebDavResponseHandler responseHandler;
     private final HandlerHelper handlerHelper;
 
@@ -63,10 +62,10 @@ public class LockHandler implements ResourceHandler {
         // Find a resource if it exists
         Resource r = manager.getResourceFactory().getResource( host, url );
         if( r != null ) {
-            log.debug( "locking existing resource: " + r.getName() );
+            Logger.debug(this, "locking existing resource: " + r.getName() );
             processExistingResource( manager, request, response, r );
         } else {
-            log.debug( "lock target doesnt exist, attempting lock null.." );
+            Logger.debug(this, "lock target doesnt exist, attempting lock null.." );
             processNonExistingResource( manager, request, response, host, url );
         }
     }
@@ -138,7 +137,7 @@ public class LockHandler implements ResourceHandler {
                 processCreateAndLock( manager, request, response, r, name );
             }
         } else {
-            log.debug( "couldnt find parent to execute lock-null, returning not found" );
+            Logger.debug(this, "couldnt find parent to execute lock-null, returning not found" );
             //respondNotFound(response,request);
             response.setStatus( Status.SC_CONFLICT );
 
@@ -147,7 +146,7 @@ public class LockHandler implements ResourceHandler {
 
     private void processCreateAndLock( HttpManager manager, Request request, Response response, Resource parentResource, String name ) throws NotAuthorizedException {
         if( parentResource instanceof LockingCollectionResource ) {
-            log.debug( "parent supports lock-null. doing createAndLock" );
+            Logger.debug(this, "parent supports lock-null. doing createAndLock" );
             LockingCollectionResource lockingParent = (LockingCollectionResource) parentResource;
             LockTimeout timeout = LockTimeout.parseTimeout( request );
             response.setContentTypeHeader( Response.XML );
@@ -163,14 +162,14 @@ public class LockHandler implements ResourceHandler {
 
             // TODO: this should be refactored to return a LockResult as for existing entities
 
-            log.debug( "Creating lock on unmapped resource: " + name );
+            Logger.debug(this, "Creating lock on unmapped resource: " + name );
             LockToken tok = lockingParent.createAndLock( name, timeout, lockInfo );
             response.setStatus( Status.SC_CREATED );
             response.setLockTokenHeader( "<opaquelocktoken:" + tok.tokenId + ">" );  // spec says to set response header. See 8.10.1
             respondWithToken( tok, request, response );
 
         } else {
-            log.debug( "parent does not support lock-null, respondong method not allowed" );
+            Logger.debug(this, "parent does not support lock-null, respondong method not allowed" );
             responseHandler.respondMethodNotImplemented( parentResource, response, request );
         }
     }
@@ -198,11 +197,11 @@ public class LockHandler implements ResourceHandler {
         // todo: check if already locked and return 423 locked or 412-precondition failed
         // also must support multi-status. when locking a collection and a DEPTH > 1, must lock all
         // child elements
-        log.debug( "locking: " + r.getName() );
+        Logger.debug(this, "locking: " + r.getName() );
         LockResult result = r.lock( timeout, lockInfo );
         if( result.isSuccessful() ) {
             LockToken tok = result.getLockToken();
-            log.debug( "..locked ok: " + tok.tokenId );
+            Logger.debug(this, "..locked ok: " + tok.tokenId );
             response.setLockTokenHeader( "<opaquelocktoken:" + tok.tokenId + ">" );  // spec says to set response header. See 8.10.1
             respondWithToken( tok, request, response );
         } else {
@@ -212,7 +211,7 @@ public class LockHandler implements ResourceHandler {
 
     protected void processRefresh( HttpManager milton, Request request, Response response, LockableResource r, LockTimeout timeout, String ifHeader ) throws NotAuthorizedException {
         String token = parseToken( ifHeader );
-        log.debug( "refreshing lock: " + token );
+        Logger.debug(this, "refreshing lock: " + token );
         LockResult result = r.refreshLock( token );
         if( result.isSuccessful() ) {
             LockToken tok = result.getLockToken();
@@ -245,11 +244,11 @@ public class LockHandler implements ResourceHandler {
         writer.close( "D:prop" );
         writer.flush();
 
-        log.debug( "lock response: " + out.toString() );
+        Logger.debug(this, "lock response: " + out.toString() );
         try {
             response.getOutputStream().write( out.toByteArray() );
         } catch( IOException ex ) {
-            log.warn( "exception writing to outputstream", ex );
+            Logger.warning(this, "exception writing to outputstream", ex );
         }
 //        response.close();
 

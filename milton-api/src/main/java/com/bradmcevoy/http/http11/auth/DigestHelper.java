@@ -3,16 +3,15 @@ package com.bradmcevoy.http.http11.auth;
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.Request.Method;
 import com.bradmcevoy.http.http11.auth.NonceProvider.NonceValidity;
+
+import freenet.log.Logger;
+
 import org.apache.commons.codec.binary.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
  */
 public class DigestHelper {
-
-    private static final Logger log = LoggerFactory.getLogger( DigestHelper.class );
 
     private final NonceProvider nonceProvider;
 
@@ -26,7 +25,7 @@ public class DigestHelper {
     public DigestResponse calculateResponse( Auth auth, String expectedRealm, Method method ) {
         // Check all required parameters were supplied (ie RFC 2069)
         if( ( auth.getUser() == null ) || ( auth.getRealm() == null ) || ( auth.getNonce() == null ) || ( auth.getUri() == null ) ) {
-            log.warn( "missing params" );
+            Logger.warning(this, "missing params" );
             return null;
         }
 
@@ -34,7 +33,7 @@ public class DigestHelper {
         Long nc;
         if( "auth".equals( auth.getQop() ) ) {
             if( ( auth.getNc() == null ) || ( auth.getCnonce() == null ) ) {
-                log.warn( "missing params: nc and/or cnonce" );
+                Logger.warning(this, "missing params: nc and/or cnonce" );
                 return null;
             }
             nc = Long.parseLong( auth.getNc(), 16); // the nonce-count. hex value, must always increase
@@ -45,17 +44,17 @@ public class DigestHelper {
         // Check realm name equals what we expected
         if( expectedRealm == null ) throw new IllegalStateException( "realm is null");
         if( !expectedRealm.equals( auth.getRealm() ) ) {
-            log.warn( "incorrect realm: resource: " + expectedRealm + " given: " + auth.getRealm() );
+            Logger.warning(this, "incorrect realm: resource: " + expectedRealm + " given: " + auth.getRealm() );
             return null;
         }
 
         // Check nonce was a Base64 encoded (as sent by DigestProcessingFilterEntryPoint)
         if( !Base64.isArrayByteBase64( auth.getNonce().getBytes() ) ) {
-            log.warn( "nonce not base64 encoded" );
+            Logger.warning(this, "nonce not base64 encoded" );
             return null;
         }
 
-        log.debug( "nc: " + auth.getNc());
+        Logger.debug(this, "nc: " + auth.getNc());
 
 
         // Decode nonce from Base64
@@ -64,10 +63,10 @@ public class DigestHelper {
         String plainTextNonce = new String( Base64.decodeBase64( auth.getNonce().getBytes() ) );
         NonceValidity validity = nonceProvider.getNonceValidity( plainTextNonce, nc );
         if( NonceValidity.INVALID.equals( validity ) ) {
-            log.debug( "invalid nonce: " + plainTextNonce );
+            Logger.debug(this, "invalid nonce: " + plainTextNonce );
             return null;
         } else if( NonceValidity.EXPIRED.equals( validity ) ) {
-            log.debug( "expired nonce: " + plainTextNonce );
+            Logger.debug(this, "expired nonce: " + plainTextNonce );
             // make this known so that we can add stale field to challenge
             auth.setNonceStale( true );
             return null;

@@ -10,8 +10,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.TimeZone;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A utility class for parsing and formatting HTTP dates as used in cookies and
@@ -22,8 +20,6 @@ import org.slf4j.LoggerFactory;
  * @author Michael Becke
  */
 public class DateUtils {
-
-    private static final Logger log = LoggerFactory.getLogger(DateUtils.class);
 
     // 2005-03-30T05:18:33Z
     public static final String PATTERN_WEBDAV = "yyyy-MM-dd HH:mm:ss";

@@ -6,9 +6,10 @@ import com.bradmcevoy.http.Request.Method;
 import com.bradmcevoy.http.Resource;
 import com.bradmcevoy.http.http11.auth.DigestGenerator;
 import com.bradmcevoy.http.http11.auth.DigestResponse;
+
+import freenet.log.Logger;
+
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Has a realm and a map where the keys are user names and the values are
@@ -17,8 +18,6 @@ import org.slf4j.LoggerFactory;
  * @author brad
  */
 public class SimpleSecurityManager implements com.bradmcevoy.http.SecurityManager{
-
-    private static final Logger log = LoggerFactory.getLogger(SimpleSecurityManager.class);
 
     private String realm;
     private Map<String,String> nameAndPasswords;
@@ -40,14 +39,14 @@ public class SimpleSecurityManager implements com.bradmcevoy.http.SecurityManage
 
 
     public Object authenticate( String user, String password ) {
-        log.debug( "authenticate: " + user + " - " + password);
+        Logger.debug(this, "authenticate: " + user + " - " + password);
         // user name will include domain when coming form ftp. we just strip it off
         if( user.contains( "@")) {
             user = user.substring( 0, user.indexOf( "@"));
         }
         String actualPassword = nameAndPasswords.get( user );
         if( actualPassword == null ) {
-            log.debug( "user not found: " + user);
+            Logger.debug(this, "user not found: " + user);
             return null;
         } else {
             boolean ok;
@@ -66,8 +65,8 @@ public class SimpleSecurityManager implements com.bradmcevoy.http.SecurityManage
         String serverResponse = dg.generateDigest( digestRequest, actualPassword );
         String clientResponse = digestRequest.getResponseDigest();
 
-        log.debug( "server resp: " + serverResponse );
-        log.debug( "given response: " + clientResponse );
+        Logger.debug(this, "server resp: " + serverResponse );
+        Logger.debug(this, "given response: " + clientResponse );
 
         if( serverResponse.equals( clientResponse ) ) {
             return "ok";
@@ -79,7 +78,7 @@ public class SimpleSecurityManager implements com.bradmcevoy.http.SecurityManage
 
 
     public boolean authorise( Request request, Method method, Auth auth, Resource resource ) {
-        log.debug( "authorise");
+        Logger.debug(this, "authorise");
         return auth != null && auth.getTag() != null;
     }
 
@@ -100,7 +99,7 @@ public class SimpleSecurityManager implements com.bradmcevoy.http.SecurityManage
 
 
 //    public MiltonUser getUserByName( String name, String domain ) {
-//        log.debug( "getUserByName: " + name + " - " + domain);
+//        Logger.debug(this, "getUserByName: " + name + " - " + domain);
 //        String actualPassword = nameAndPasswords.get( name );
 //        if( actualPassword == null ) return null;
 //        return new MiltonUser( name, name, domain );

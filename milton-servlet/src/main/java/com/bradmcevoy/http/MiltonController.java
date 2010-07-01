@@ -28,12 +28,12 @@ public class MiltonController implements Controller {
     }
 
     public MiltonController(HttpManager httpManager) {
-        log.debug("created miltoncontroller");
+        Logger.debug(this, "created miltoncontroller");
         this.httpManager = httpManager;
     }
 
     public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        log.debug("handleRequest: " + request.getRequestURI() + " method:" + request.getMethod() ) ;
+        Logger.debug(this, "handleRequest: " + request.getRequestURI() + " method:" + request.getMethod() ) ;
         ServletRequest rq = new ServletRequest(request);
         ServletResponse rs = new ServletResponse(response);
         httpManager.process(rq, rs);

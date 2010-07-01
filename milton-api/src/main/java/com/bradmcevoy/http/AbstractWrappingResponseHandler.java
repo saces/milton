@@ -6,9 +6,6 @@ import com.bradmcevoy.http.quota.StorageChecker.StorageErrorReason;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 import com.bradmcevoy.http.webdav.PropFindResponse;
 import com.bradmcevoy.http.webdav.WebDavResponseHandler;
@@ -19,8 +16,6 @@ import com.bradmcevoy.http.webdav.WebDavResponseHandler;
  * @author brad
  */
 public abstract class AbstractWrappingResponseHandler implements WebDavResponseHandler {
-
-    private static final Logger log = LoggerFactory.getLogger( AbstractWrappingResponseHandler.class );
 
     /**
      * The underlying respond handler which takes care of actually generating

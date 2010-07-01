@@ -8,10 +8,9 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.bradmcevoy.io.FileUtils;
+
+import freenet.log.Logger;
 
 /**
  * Lightweight XML generation. Gives the programmer fine grained control
@@ -22,8 +21,6 @@ import com.bradmcevoy.io.FileUtils;
  * @author brad
  */
 public class XmlWriter {
-
-    private Logger log = LoggerFactory.getLogger(XmlWriter.class);
 
     public enum Type {
 
@@ -395,14 +392,14 @@ public class XmlWriter {
     }
 
     public void sample(InputStream in) {
-        log.debug("outputting sample");
+        Logger.debug(this, "outputting sample");
         try {
             ByteArrayOutputStream out = FileUtils.readIn(in);
             writer.write(out.toString());
         } catch (FileNotFoundException ex) {
-            log.error("", ex);
+            Logger.error(this, "", ex);
         } catch (IOException ex) {
-            log.error("", ex);
+            Logger.error(this, "", ex);
         } finally {
             FileUtils.close(in);
         }

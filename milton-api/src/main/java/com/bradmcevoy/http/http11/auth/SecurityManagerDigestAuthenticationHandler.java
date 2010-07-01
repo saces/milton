@@ -5,8 +5,8 @@ import com.bradmcevoy.http.AuthenticationHandler;
 import com.bradmcevoy.http.Request;
 import com.bradmcevoy.http.Resource;
 import com.bradmcevoy.http.SecurityManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import freenet.log.Logger;
 
 /**
  *
@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
  */
 public class SecurityManagerDigestAuthenticationHandler implements AuthenticationHandler {
 
-    private static final Logger log = LoggerFactory.getLogger( SecurityManagerDigestAuthenticationHandler.class );
     private final NonceProvider nonceProvider;
 
     private final SecurityManager securityManager;
@@ -41,7 +40,7 @@ public class SecurityManagerDigestAuthenticationHandler implements Authenticatio
         Auth auth = request.getAuthorization();
         DigestResponse resp = digestHelper.calculateResponse(auth, securityManager.getRealm(request.getHostHeader()), request.getMethod());
         if( resp == null ) {
-            log.debug("requested digest authentication is invalid or incorrectly formatted");
+            Logger.debug(this, "requested digest authentication is invalid or incorrectly formatted");
             return null;
         } else {
             Object o = securityManager.authenticate( resp );

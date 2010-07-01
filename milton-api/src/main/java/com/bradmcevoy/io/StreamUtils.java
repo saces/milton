@@ -8,14 +8,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.beanutils.BeanUtilsBean;
+
+import freenet.log.Logger;
 
 public class StreamUtils {
-    
-    private static Logger log = LoggerFactory.getLogger(StreamUtils.class);
 
-    
     private StreamUtils() {
     }
 
@@ -38,13 +36,13 @@ public class StreamUtils {
             try {
                 in.close();
             } catch (IOException ex) {
-                log.error("exception closing output stream",ex);
+                Logger.error(StreamUtils.class, "exception closing output stream",ex);
             }
             if( closeOut ) {
                 try {
                     out.close();
                 } catch (IOException ex) {
-                    log.error("exception closing outputstream",ex);
+                    Logger.error(StreamUtils.class, "exception closing outputstream",ex);
                 }
             }
         }        
@@ -61,13 +59,13 @@ public class StreamUtils {
             try {
                 out.close();
             } catch (IOException ex) {
-                log.error("exception closing output stream",ex);
+                Logger.error(StreamUtils.class, "exception closing output stream",ex);
             }
             if( closeIn ) {
                 try {
                     in.close();
                 } catch (IOException ex) {
-                    log.error("exception closing inputstream",ex);
+                    Logger.error(StreamUtils.class, "exception closing inputstream",ex);
                 }
             }
         }        
@@ -117,7 +115,7 @@ public class StreamUtils {
             } catch (IOException ex) {
                 throw new ReadingException(ex);
             } catch (NullPointerException e) {
-                log.debug( "nullpointer exception reading input stream. it happens for sun.nio.ch.ChannelInputStream.read(ChannelInputStream.java:48)");
+                Logger.debug(StreamUtils.class, "nullpointer exception reading input stream. it happens for sun.nio.ch.ChannelInputStream.read(ChannelInputStream.java:48)");
                 return cnt;
             }
             long numBytes = 0;
@@ -160,7 +158,7 @@ public class StreamUtils {
         try {
             out.close();
         } catch (IOException ex) {
-            log.warn("exception closing output stream",ex);
+            Logger.warning(BeanUtilsBean.class, "exception closing output stream",ex);
         }
     }
     
@@ -169,7 +167,7 @@ public class StreamUtils {
         try {
             in.close();
         } catch (IOException ex) {
-            log.warn("exception closing inputstream",ex);
+            Logger.warning(BeanUtilsBean.class, "exception closing inputstream",ex);
         }
     }
 }

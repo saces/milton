@@ -19,6 +19,9 @@ import com.bradmcevoy.http.Request;
 import com.bradmcevoy.http.Resource;
 import com.bradmcevoy.http.XmlWriter;
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
+
+import freenet.log.Logger;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,16 +32,12 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Represents a directory in a physical file system.
  *
  */
 public class FsDirectoryResource extends FsResource implements MakeCollectionableResource, PutableResource, CopyableResource, DeletableResource, MoveableResource, PropFindableResource, LockingCollectionResource, GetableResource {
-
-    private static final Logger log = LoggerFactory.getLogger( FsDirectoryResource.class );
 
     public FsDirectoryResource( String host, FileSystemResourceFactory factory, File dir ) {
         super( host, factory, dir );
@@ -71,7 +70,7 @@ public class FsDirectoryResource extends FsResource implements MakeCollectionabl
                 if( res != null ) {
                     list.add( res );
                 } else {
-                    log.error( "Couldnt resolve file {}", fchild.getAbsolutePath() );
+                    Logger.error(this, "Couldnt resolve file: "+ fchild.getAbsolutePath());
                 }
             }
         }

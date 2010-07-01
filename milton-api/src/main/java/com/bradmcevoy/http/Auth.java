@@ -3,8 +3,6 @@ package com.bradmcevoy.http;
 import com.bradmcevoy.common.StringSplitUtils;
 import java.util.Map;
 import org.apache.commons.codec.binary.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Holds authentication information for a request
@@ -22,8 +20,6 @@ import org.slf4j.LoggerFactory;
  * @author brad
  */
 public class Auth {
-
-    private static final Logger log = LoggerFactory.getLogger( Auth.class );
 
     /**
      * Holds application specific user data, as returned from the authenticate
@@ -53,7 +49,7 @@ public class Auth {
 
 
     public Auth( String sAuth ) {
-//        log.debug( "parse: " + sAuth);
+//        Logger.debug(this, "parse: " + sAuth);
         int pos = sAuth.indexOf( " " );
         String schemeCode;
         String enc;
@@ -180,7 +176,7 @@ public class Auth {
         String[] headerEntries = StringSplitUtils.splitIgnoringQuotes( s, ',' );
         Map headerMap = StringSplitUtils.splitEachArrayElementAndCreateMap( headerEntries, "=", "\"" );
 
-//        log.debug( "headerMap: " + headerMap);
+//        Logger.debug(this, "headerMap: " + headerMap);
 
         user = (String) headerMap.get( "username" );
         realm = (String) headerMap.get( "realm" );

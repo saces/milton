@@ -2,16 +2,14 @@ package com.bradmcevoy.http;
 
 import com.bradmcevoy.http.Request.Method;
 import com.bradmcevoy.http.http11.auth.DigestResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import freenet.log.Logger;
 
 /**
  *
  * @author brad
  */
 public class ReadOnlySecurityManager implements SecurityManager{
-
-    private Logger log = LoggerFactory.getLogger( ReadOnlySecurityManager.class );
 
     private final String realm;
 
@@ -42,7 +40,7 @@ public class ReadOnlySecurityManager implements SecurityManager{
             case OPTIONS: return true;
             case PROPFIND: return true;
         }
-        log.debug("denying access to method {} on {}", method, request.getAbsolutePath());
+        Logger.debug(this, "denying access to method '"+method+"' on '"+request.getAbsolutePath()+"'.");
         return false;
     }
 

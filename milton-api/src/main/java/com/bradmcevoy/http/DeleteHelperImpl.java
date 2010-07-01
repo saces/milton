@@ -1,10 +1,11 @@
 package com.bradmcevoy.http;
 
 import com.bradmcevoy.http.http11.DeleteHandler.CantDeleteException;
+
+import freenet.log.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of DeleteHelper
@@ -16,8 +17,6 @@ import org.slf4j.LoggerFactory;
  */
 public class DeleteHelperImpl implements DeleteHelper {
 
-    private Logger log = LoggerFactory.getLogger(DeleteHelperImpl.class);
-
     private final HandlerHelper handlerHelper;
 
     public DeleteHelperImpl(HandlerHelper handlerHelper) {
@@ -28,8 +27,8 @@ public class DeleteHelperImpl implements DeleteHelper {
         if (r instanceof DeletableCollectionResource) {
             DeletableCollectionResource dcr = (DeletableCollectionResource) r;
             boolean locked = dcr.isLockedOutRecursive(req);
-            if( locked && log.isInfoEnabled()) {
-                log.info("isLocked, as reported by DeletableCollectionResource: " + dcr.getName());
+            if( locked /*&& log.isInfoEnabled()*/) {
+                Logger.normal(this, "isLocked, as reported by DeletableCollectionResource: " + dcr.getName());
             }
             return locked;
             
@@ -41,15 +40,15 @@ public class DeleteHelperImpl implements DeleteHelper {
                 if (rChild instanceof DeletableResource) {
                     DeletableResource rChildDel = (DeletableResource) rChild;
                     if (isLockedOut(req, rChildDel)) {
-                        if( log.isInfoEnabled()) {
-                            log.info("isLocked: " + rChild.getName() + " type:" + rChild.getClass());
-                        }
+                        //if( log.isInfoEnabled()) {
+                            Logger.normal(this, "isLocked: " + rChild.getName() + " type:" + rChild.getClass());
+                        //}
                         return true;
                     }
                 } else {
-                    if( log.isInfoEnabled() ) {
-                        log.info("a child resource is not deletable: " + rChild.getName() + " type: " + rChild.getClass());
-                    }
+                    //if( log.isInfoEnabled() ) {
+                        Logger.normal(this, "a child resource is not deletable: " + rChild.getName() + " type: " + rChild.getClass());
+                    //}
                     return true;
                 }
             }
@@ -57,8 +56,8 @@ public class DeleteHelperImpl implements DeleteHelper {
 
         } else {
             boolean locked = handlerHelper.isLockedOut(req, r);
-            if( locked && log.isInfoEnabled()) {
-                log.info("isLocked, as reported by handlerHelper on resource: " + r.getName());
+            if( locked /*&& log.isInfoEnabled()*/) {
+                Logger.normal(this, "isLocked, as reported by handlerHelper on resource: " + r.getName());
             }
             return locked;
             

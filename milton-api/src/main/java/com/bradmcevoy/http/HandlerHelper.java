@@ -5,9 +5,10 @@ import com.bradmcevoy.http.Request.Method;
 import com.bradmcevoy.http.http11.Http11ResponseHandler;
 import com.bradmcevoy.http.quota.StorageChecker;
 import com.bradmcevoy.http.quota.StorageChecker.StorageErrorReason;
+
+import freenet.log.Logger;
+
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -15,7 +16,6 @@ import org.slf4j.LoggerFactory;
  */
 public class HandlerHelper {
 
-    private final static Logger log = LoggerFactory.getLogger( HandlerHelper.class );
     private AuthenticationService authenticationService;
     private final List<StorageChecker> storageCheckers;
 
@@ -49,14 +49,14 @@ public class HandlerHelper {
             if( auth.getTag() == null ) {  // don't do double authentication
                 Object authTag = authenticationService.authenticate( resource, request ); //handler.authenticate( auth.user, auth.password );
                 if( authTag == null ) {
-                    log.warn( "failed to authenticate - authenticationService:" + authenticationService.getClass() + " resource type:" + resource.getClass() );
+                    Logger.warning(this, "failed to authenticate - authenticationService:" + authenticationService.getClass() + " resource type:" + resource.getClass() );
                     return false;
                 } else {
-                    log.debug( "got authenticated tag: " + authTag.getClass() );
+                    Logger.debug(this, "got authenticated tag: " + authTag.getClass() );
                     auth.setTag( authTag );
                 }
             } else {
-                log.trace("request is pre-authenticated");
+                Logger.debug(this, "request is pre-authenticated");
             }
         } else {
             auth = manager.getSessionAuthentication( request );
@@ -65,12 +65,12 @@ public class HandlerHelper {
 
         boolean authorised = resource.authorise( request, request.getMethod(), auth );
         if( !authorised ) {
-            if( log.isWarnEnabled()) {
-                log.warn( "authorisation declined, requesting authentication: " + request.getAbsolutePath() + ". resource type: " + resource.getClass().getCanonicalName());
+            //if( log.isWarnEnabled()) {
+                Logger.warning(this, "authorisation declined, requesting authentication: " + request.getAbsolutePath() + ". resource type: " + resource.getClass().getCanonicalName());
                 if( auth != null ) {
-                    log.warn("auth: " + auth.getUser() + " tag: " + auth.getTag());
+                    Logger.warning(this, "auth: " + auth.getUser() + " tag: " + auth.getTag());
                 }
-            }
+            //}
             return false;
         } else {
             return true;
@@ -104,14 +104,14 @@ public class HandlerHelper {
             Auth auth = inRequest.getAuthorization();
             String lockedByUser = token.info.lockedByUser;
             if( lockedByUser == null ) {
-                log.warn( "Resource is locked with a null user. Ignoring the lock" );
+                Logger.warning(this, "Resource is locked with a null user. Ignoring the lock" );
                 return false;
             } else if( !lockedByUser.equals( auth.getUser() ) ) {
-                log.info( "fail: lock owned by: " + lockedByUser + " not by " + auth.getUser() );
+                Logger.normal(this, "fail: lock owned by: " + lockedByUser + " not by " + auth.getUser() );
                 String value = inRequest.getIfHeader();
                 if( value != null ) {
                     if( value.contains( "opaquelocktoken:" + token.tokenId + ">" ) ) {
-                        log.info( "Contained valid token. so is unlocked" );
+                        Logger.normal(this, "Contained valid token. so is unlocked" );
                         return false;
                     }
                 }
@@ -126,7 +126,7 @@ public class HandlerHelper {
         String value = inRequest.getHeaders().get( "If" );
         if( value != null ) {
             if( value.contains( "(<DAV:no-lock>)" ) ) {
-                log.info( "Contained valid token. so is unlocked" );
+                Logger.normal(this, "Contained valid token. so is unlocked");
                 return true;
             }
         }
@@ -138,7 +138,7 @@ public class HandlerHelper {
         for( StorageChecker sc : storageCheckers) {
             StorageErrorReason res = sc.checkStorageOnReplace( request, parentCol, replaced, host );
             if( res != null ) {
-                log.warn( "insufficient storage reason: " + res + " reported by: " + sc.getClass() );
+                Logger.warning(this, "insufficient storage reason: " + res + " reported by: " + sc.getClass() );
                 return res;
             }
         }
@@ -149,7 +149,7 @@ public class HandlerHelper {
         for( StorageChecker sc : storageCheckers) {
             StorageErrorReason res = sc.checkStorageOnAdd( request, nearestParent, parentPath, host );
             if( res != null ) {
-                log.warn( "insufficient storage reason: " + res + " reported by: " + sc.getClass() );
+                Logger.warning(this, "insufficient storage reason: " + res + " reported by: " + sc.getClass() );
                 return res;
             }
         }

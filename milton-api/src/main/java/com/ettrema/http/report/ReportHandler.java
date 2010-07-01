@@ -14,20 +14,20 @@ import com.bradmcevoy.http.webdav.WebDavResponseHandler;
 import com.bradmcevoy.io.ReadingException;
 import com.bradmcevoy.io.WritingException;
 import com.bradmcevoy.http.ReportableResource;
+
+import freenet.log.Logger;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import org.jdom.JDOMException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author alex
  */
 public class ReportHandler implements ExistingEntityHandler {
-    private Logger log = LoggerFactory.getLogger(ReportHandler.class);
 
     private final WebDavResponseHandler responseHandler;
     private final ResourceHandlerHelper resourceHandlerHelper;
@@ -58,7 +58,7 @@ public class ReportHandler implements ExistingEntityHandler {
             String reportName = doc.getRootElement().getName();
             Report r = reports.get( reportName);
             if( r == null ) {
-                log.error( "report not known: " + reportName );
+                Logger.error(this, "report not known: " + reportName );
                 throw new BadRequestException( resource );
             } else {
                 String xml = r.process( request.getHostHeader(), resource, doc );

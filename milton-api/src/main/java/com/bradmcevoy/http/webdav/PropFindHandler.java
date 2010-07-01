@@ -8,10 +8,9 @@ import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 import java.io.IOException;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.bradmcevoy.http.Request.Method;
+
+import freenet.log.Logger;
 
 
 /**
@@ -19,8 +18,6 @@ import com.bradmcevoy.http.Request.Method;
  * @author brad
  */
 public class PropFindHandler implements ExistingEntityHandler {
-
-    private static final Logger log = LoggerFactory.getLogger( PropFindHandler.class );
 
     private final ResourceHandlerHelper resourceHandlerHelper;
     private final PropFindRequestFieldParser requestFieldParser;    
@@ -78,7 +75,7 @@ public class PropFindHandler implements ExistingEntityHandler {
     }
 
     public void processExistingResource( HttpManager manager, Request request, Response response, Resource resource ) throws NotAuthorizedException, BadRequestException, ConflictException {
-        log.debug( "propfind");
+        Logger.debug(this, "propfind");
         PropFindableResource pfr = (PropFindableResource) resource;
         int depth = request.getDepthHeader();
         response.setStatus( Response.Status.SC_MULTI_STATUS );

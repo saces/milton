@@ -7,11 +7,11 @@ import com.bradmcevoy.http.Request;
 import com.bradmcevoy.http.Response;
 import com.bradmcevoy.http.http11.Http11ResponseHandler;
 import com.bradmcevoy.http.SecurityManager;
+
+import freenet.log.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 /**
  * A filter to perform authentication before resource location.
@@ -25,8 +25,6 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class PreAuthenticationFilter implements Filter {
-
-    private static final Logger log = LoggerFactory.getLogger( PreAuthenticationFilter.class );
 
     private static final ThreadLocal<Request> tlRequest = new ThreadLocal<Request>();
 
@@ -52,7 +50,7 @@ public class PreAuthenticationFilter implements Filter {
 
 
     public void process(FilterChain chain, Request request, Response response) {
-        log.trace("process");
+        Logger.debug(this, "process");
         try {
             tlRequest.set(request);
             Object authTag = authenticate(request);
@@ -83,12 +81,12 @@ public class PreAuthenticationFilter implements Filter {
             if( h.supports( null, request ) ) {
                 Object o = h.authenticate( null, request );
                 if( o == null ) {
-                    log.warn( "authentication failed by AuthenticationHandler:" + h.getClass() );
+                    Logger.warning(this, "authentication failed by AuthenticationHandler:" + h.getClass() );
                 }
                 return o;
             }
         }
-        log.warn( "No AuthenticationHandler supports scheme:" + request.getAuthorization().getScheme()  );
+        Logger.warning(this, "No AuthenticationHandler supports scheme:" + request.getAuthorization().getScheme()  );
         return null;
     }
 

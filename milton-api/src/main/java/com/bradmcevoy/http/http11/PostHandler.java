@@ -4,16 +4,15 @@ import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.exceptions.BadRequestException;
 import com.bradmcevoy.http.exceptions.ConflictException;
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
+
+import freenet.log.Logger;
+
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class PostHandler implements ExistingEntityHandler {
 
-    private Logger log = LoggerFactory.getLogger( PostHandler.class );
     private final Http11ResponseHandler responseHandler;
     private final HandlerHelper handlerHelper;
     private final ResourceHandlerHelper resourceHandlerHelper;
@@ -42,7 +41,7 @@ public class PostHandler implements ExistingEntityHandler {
         try {
             request.parseRequestParameters( params, files );
         } catch( RequestParseException ex ) {
-            log.warn( "exception parsing request. probably interrupted upload", ex );
+            Logger.warning(this, "exception parsing request. probably interrupted upload", ex );
             return;
         }
 

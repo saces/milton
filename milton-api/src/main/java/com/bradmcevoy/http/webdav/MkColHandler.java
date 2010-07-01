@@ -8,12 +8,11 @@ import com.bradmcevoy.http.exceptions.BadRequestException;
 import com.bradmcevoy.http.exceptions.ConflictException;
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 import com.bradmcevoy.http.http11.Http11ResponseHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import freenet.log.Logger;
 
 public class MkColHandler implements Handler {
 
-    private static final Logger log = LoggerFactory.getLogger( MkColHandler.class );
     private final Http11ResponseHandler responseHandler;
     private final HandlerHelper handlerHelper;
 
@@ -38,7 +37,7 @@ public class MkColHandler implements Handler {
         String host = request.getHostHeader();
         String finalurl = HttpManager.decodeUrl( request.getAbsolutePath() );
         String name;
-        log.debug( "process request: host: " + host + " url: " + finalurl );
+        Logger.debug(this, "process request: host: " + host + " url: " + finalurl );
 
         Path finalpath = Path.path( finalurl ); //this is the parent collection it goes in
         name = finalpath.getName();
@@ -47,10 +46,10 @@ public class MkColHandler implements Handler {
 
         Resource parentcol = manager.getResourceFactory().getResource( host, parenturl );
         if( parentcol != null ) {
-            log.debug( "process: resource: " + parentcol.getClass().getName() );
+            Logger.debug(this, "process: resource: " + parentcol.getClass().getName() );
 
             if( handlerHelper.isLockedOut( request, parentcol ) ) {
-                log.warn("isLockedOut");
+                Logger.warning(this, "isLockedOut");
                 response.setStatus( Status.SC_LOCKED );
                 return;
             }
@@ -68,12 +67,12 @@ public class MkColHandler implements Handler {
                 CollectionResource col = (CollectionResource) parentcol;
                 processMakeCol( manager, request, response, col, name );
             } else {
-                log.warn("parent collection is no a CollectionResource: " + parentcol.getName());
+                Logger.warning(this, "parent collection is no a CollectionResource: " + parentcol.getName());
                 responseHandler.respondConflict( parentcol, response, request, "not a collection" );
             }
             
         } else {
-            log.warn("parent does not exist: " + parenturl);
+            Logger.warning(this, "parent does not exist: " + parenturl);
             manager.getResponseHandler().respondConflict( parentcol, response, request, name );
         }
     }
@@ -97,12 +96,12 @@ public class MkColHandler implements Handler {
         }
         Resource existingChild = existingCol.child( newName );
         if( existingChild != null ) {
-            log.warn( "item already exists: " + existingChild.getName() );
+            Logger.warning(this, "item already exists: " + existingChild.getName() );
             throw new ConflictException( existingChild );
         }
         CollectionResource made = existingCol.createCollection( newName );
         if( made == null ) {
-            log.warn( "createCollection returned null. In resource class: " + existingCol.getClass());
+            Logger.warning(this, "createCollection returned null. In resource class: " + existingCol.getClass());
             response.setStatus( Response.Status.SC_METHOD_NOT_ALLOWED );
         } else {
             response.setStatus( Response.Status.SC_CREATED );

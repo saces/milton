@@ -3,18 +3,16 @@ package com.bradmcevoy.common;
 import eu.medsea.mimeutil.MimeException;
 import eu.medsea.mimeutil.MimeType;
 import eu.medsea.mimeutil.MimeUtil;
+import freenet.log.Logger;
+
 import java.io.File;
 import java.util.Collection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author brad
  */
 public class ContentTypeUtils {
-
-    private static Logger log = LoggerFactory.getLogger(ContentTypeUtils.class);
 
     public static String findContentTypes( String name ) {
         Collection mimeTypes = MimeUtil.getMimeTypes( name );
@@ -26,7 +24,7 @@ public class ContentTypeUtils {
         try {
             mimeTypes = MimeUtil.getMimeTypes( file );
         } catch( MimeException e ) {
-            log.warn( "exception retrieving content type for file: " + file.getAbsolutePath(),e);
+            Logger.warning(ContentTypeUtils.class, "exception retrieving content type for file: " + file.getAbsolutePath(),e);
             return "application/binary";
         }
         return buildContentTypeText(mimeTypes);

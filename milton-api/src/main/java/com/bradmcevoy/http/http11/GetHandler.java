@@ -5,17 +5,17 @@ import com.bradmcevoy.http.Request.Method;
 import com.bradmcevoy.http.exceptions.BadRequestException;
 import com.bradmcevoy.http.exceptions.ConflictException;
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
+
+import freenet.log.Logger;
+
 import java.util.Date;
 import java.util.Map;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class GetHandler implements ExistingEntityHandler {
 
-    private static final Logger log = LoggerFactory.getLogger( GetHandler.class );
     private final Http11ResponseHandler responseHandler;
     private final HandlerHelper handlerHelper;
     private final ResourceHandlerHelper resourceHandlerHelper;
@@ -39,7 +39,7 @@ public class GetHandler implements ExistingEntityHandler {
     }
 
     public void processExistingResource( HttpManager manager, Request request, Response response, Resource resource) throws NotAuthorizedException, BadRequestException, ConflictException {
-//        log.debug( "process: " + request.getAbsolutePath() );
+//        Logger.debug(this, "process: " + request.getAbsolutePath() );
         GetableResource r = (GetableResource) resource;
         if( checkConditional( r, request ) ) {
             responseHandler.respondNotModified( r, response, request );
@@ -108,9 +108,9 @@ public class GetHandler implements ExistingEntityHandler {
                 return false;
             } else {
                 long timeActual = dtCurrent.getTime();
-        //        log.debug("times as long: " + dtCurrent.getTime() + " - " + dtRequest.getTime());
+        //        Logger.debug(this, "times as long: " + dtCurrent.getTime() + " - " + dtRequest.getTime());
                 boolean unchangedSince = ( timeRequest >= timeActual );
-        //        log.debug("checkModifiedSince: actual: " + dtCurrent + " - request:" + dtRequest + " = " + unchangedSince  + " (true indicates no change)");
+        //        Logger.debug(this, "checkModifiedSince: actual: " + dtCurrent + " - request:" + dtRequest + " = " + unchangedSince  + " (true indicates no change)");
                 
                 // If the modified time requested is greater or equal then the actual modified time, do not generate response
                 return unchangedSince;
@@ -149,7 +149,7 @@ public class GetHandler implements ExistingEntityHandler {
         } catch( BadRequestException badRequestException ) {
             throw badRequestException;
         } catch(Throwable e) {
-            log.error( "Exception sending content for:" + request.getAbsolutePath() + " of resource type: " + resource.getClass().getCanonicalName());
+            Logger.error(this, "Exception sending content for:" + request.getAbsolutePath() + " of resource type: " + resource.getClass().getCanonicalName());
             throw new RuntimeException( e );
         }
     }

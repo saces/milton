@@ -1,6 +1,9 @@
 package com.bradmcevoy.http;
 
 import com.bradmcevoy.http.Response.Header;
+
+import freenet.log.Logger;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collections;
@@ -9,12 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ServletResponse extends AbstractResponse {
-
-    private static final Logger log = LoggerFactory.getLogger(ServletResponse.class);
 
     private static ThreadLocal<HttpServletResponse> tlResponse = new ThreadLocal<HttpServletResponse>();
 
@@ -111,7 +110,7 @@ public class ServletResponse extends AbstractResponse {
         try {
             r.sendRedirect(u);
         } catch (IOException ex) {
-            log.warn("exception sending redirect",ex);
+            Logger.warning(this, "exception sending redirect",ex);
         }
     }    
 

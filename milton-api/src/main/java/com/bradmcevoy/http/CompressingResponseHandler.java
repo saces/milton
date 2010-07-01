@@ -6,9 +6,6 @@ import java.io.OutputStream;
 import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 import com.bradmcevoy.http.webdav.WebDavResponseHandler;
 import com.bradmcevoy.io.BufferingOutputStream;
@@ -16,6 +13,9 @@ import com.bradmcevoy.io.FileUtils;
 import com.bradmcevoy.io.ReadingException;
 import com.bradmcevoy.io.StreamUtils;
 import com.bradmcevoy.io.WritingException;
+
+import freenet.log.Logger;
+
 import java.util.Date;
 
 /**
@@ -27,8 +27,6 @@ import java.util.Date;
  * @author brad
  */
 public class CompressingResponseHandler extends AbstractWrappingResponseHandler {
-
-    private static final Logger log = LoggerFactory.getLogger( CompressingResponseHandler.class );
 
     /**
      * The size to buffer in memory before switching to disk cache.
@@ -68,7 +66,7 @@ public class CompressingResponseHandler extends AbstractWrappingResponseHandler 
                     FileUtils.close( tempOut);
                 }
 
-                log.debug( "respondContent-compressed: " + resource.getClass() );
+                Logger.debug(this, "respondContent-compressed: " + resource.getClass() );
                 setRespondContentCommonHeaders( response, resource, Response.Status.SC_OK );
                 response.setContentEncodingHeader( Response.ContentEncoding.GZIP );
                 Long contentLength = tempOut.getSize();
@@ -80,7 +78,7 @@ public class CompressingResponseHandler extends AbstractWrappingResponseHandler 
                 } catch( ReadingException ex ) {
                     throw new RuntimeException( ex );
                 } catch( WritingException ex ) {
-                    log.warn("exception writing, client probably closed connection", ex);
+                    Logger.warning(this, "exception writing, client probably closed connection", ex);
                 }
                 return ;
             }
@@ -101,13 +99,13 @@ public class CompressingResponseHandler extends AbstractWrappingResponseHandler 
     }
 
     private boolean canCompress( GetableResource r, String contentType, String acceptableEncodings ) {
-        log.debug( "canCompress: contentType: " + contentType + " acceptable-encodings: " + acceptableEncodings );
+        Logger.debug(this, "canCompress: contentType: " + contentType + " acceptable-encodings: " + acceptableEncodings );
         if( contentType != null ) {
             contentType = contentType.toLowerCase();
             boolean contentIsCompressable = contentType.contains( "text" ) || contentType.contains( "css" ) || contentType.contains( "js" ) || contentType.contains( "javascript" );
             if( contentIsCompressable ) {
                 boolean supportsGzip = ( acceptableEncodings != null && acceptableEncodings.toLowerCase().indexOf( "gzip" ) > -1 );
-                log.debug( "supports gzip: " + supportsGzip );
+                Logger.debug(this, "supports gzip: " + supportsGzip );
                 return supportsGzip;
             }
         }

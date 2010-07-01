@@ -4,17 +4,15 @@ import com.bradmcevoy.common.Path;
 import com.bradmcevoy.http.Resource;
 import com.bradmcevoy.http.ResourceFactory;
 import java.io.File;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.bradmcevoy.http.SecurityManager;
+
+import freenet.log.Logger;
 
 /**
  *
  */
 public class FileSystemResourceFactory implements ResourceFactory {
 
-    private static final Logger log = LoggerFactory.getLogger(FileSystemResourceFactory.class);
-    
     File root;
     SecurityManager securityManager;
     LockManager lockManager;
@@ -40,7 +38,7 @@ public class FileSystemResourceFactory implements ResourceFactory {
      * 
      */
     public FileSystemResourceFactory() {
-        log.debug("setting default configuration...");
+        Logger.debug(this, "setting default configuration...");
         String sRoot = System.getProperty("user.home");
         SecurityManager sm = new NullSecurityManager();
         init(sRoot, sm);
@@ -83,19 +81,19 @@ public class FileSystemResourceFactory implements ResourceFactory {
     }
 
     public void setRoot(File root) {
-        log.debug("root: " + root.getAbsolutePath());        
+        Logger.debug(this, "root: " + root.getAbsolutePath());        
         this.root = root;
         if( !root.exists() ) {
-            log.warn("Root folder does not exist: " + root.getAbsolutePath());
+            Logger.warning(this, "Root folder does not exist: " + root.getAbsolutePath());
         }
         if( !root.isDirectory() ) {
-            log.warn("Root exists but is not a directory: " + root.getAbsolutePath());
+            Logger.warning(this, "Root exists but is not a directory: " + root.getAbsolutePath());
         }
     }
         
     
     public Resource getResource(String host, String url) {
-        log.debug("getResource: host: " + host + " - url:" + url);
+        Logger.debug(this, "getResource: host: " + host + " - url:" + url);
         url = stripContext(url);
         File requested = resolvePath(root,url);
         return resolveFile(host, requested);
@@ -107,7 +105,7 @@ public class FileSystemResourceFactory implements ResourceFactory {
     
     public FsResource resolveFile(String host, File file) {
         if( !file.exists() ) {
-            log.debug("file not found: " + file.getAbsolutePath());
+            Logger.debug(this, "file not found: " + file.getAbsolutePath());
             return null;
         } else if( file.isDirectory() ) {
             return new FsDirectoryResource(host, this, file);
@@ -139,9 +137,9 @@ public class FileSystemResourceFactory implements ResourceFactory {
        
     public void setSecurityManager(SecurityManager securityManager) {
         if( securityManager != null ) {
-            log.debug("securityManager: " + securityManager.getClass());        
+            Logger.debug(this, "securityManager: " + securityManager.getClass());        
         } else {
-            log.warn("Setting null FsSecurityManager. This WILL cause null pointer exceptions");
+            Logger.warning(this, "Setting null FsSecurityManager. This WILL cause null pointer exceptions");
         }
         this.securityManager = securityManager;
     }
@@ -207,7 +205,7 @@ public class FileSystemResourceFactory implements ResourceFactory {
     private String stripContext( String url ) {
         if( this.contextPath != null && contextPath.length() > 0 ) {
             url = url.replaceFirst( '/' + contextPath, "");
-            log.debug( "stripped context: " + url);
+            Logger.debug(this, "stripped context: " + url);
             return url;
         } else {
             return url;

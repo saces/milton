@@ -3,17 +3,15 @@ package com.bradmcevoy.http.http11;
 import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.exceptions.BadRequestException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.bradmcevoy.http.Request.Method;
 import com.bradmcevoy.http.Response.Status;
 import com.bradmcevoy.http.exceptions.ConflictException;
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 
+import freenet.log.Logger;
+
 public class DeleteHandler implements ExistingEntityHandler {
 
-    private Logger log = LoggerFactory.getLogger(DeleteHandler.class);
     private final Http11ResponseHandler responseHandler;
     private final HandlerHelper handlerHelper;
     private final ResourceHandlerHelper resourceHandlerHelper;
@@ -45,22 +43,22 @@ public class DeleteHandler implements ExistingEntityHandler {
     }
 
     public void processExistingResource(HttpManager manager, Request request, Response response, Resource resource) throws NotAuthorizedException, BadRequestException, ConflictException {
-        log.debug("DELETE: " + request.getAbsoluteUrl());
+        Logger.debug(this, "DELETE: " + request.getAbsoluteUrl());
 
         DeletableResource r = (DeletableResource) resource;
 
         if (deleteHelper.isLockedOut(request, r)) {
-            log.info("Could not delete. Is locked");
+            Logger.normal(this, "Could not delete. Is locked");
             responseHandler.respondDeleteFailed(request, response, r, Status.SC_LOCKED);
             return;
         }
 
         try {
             deleteHelper.delete(r);
-            log.debug("deleted ok");
+            Logger.debug(this, "deleted ok");
             responseHandler.respondNoContent(resource, response, request);
         } catch (CantDeleteException e) {
-            log.error("failed to delete: " + request.getAbsoluteUrl(), e);
+            Logger.error(this, "failed to delete: " + request.getAbsoluteUrl(), e);
             responseHandler.respondDeleteFailed(request, response, e.resource, e.status);
         }
 

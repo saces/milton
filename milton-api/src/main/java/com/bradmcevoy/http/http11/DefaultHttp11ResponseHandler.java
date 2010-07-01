@@ -10,17 +10,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
+
+import freenet.log.Logger;
 
 /**
  *
  */
 public class DefaultHttp11ResponseHandler implements Http11ResponseHandler {
 
-    private static final Logger log = LoggerFactory.getLogger( DefaultHttp11ResponseHandler.class );
     public static final String METHOD_NOT_ALLOWED_HTML = "<html><body><h1>Method Not Allowed</h1></body></html>";
     public static final String NOT_FOUND_HTML = "<html><body><h1>${url} Not Found (404)</h1></body></html>";
     public static final String METHOD_NOT_IMPLEMENTED_HTML = "<html><body><h1>Method Not Implemented</h1></body></html>";
@@ -71,24 +69,24 @@ public class DefaultHttp11ResponseHandler implements Http11ResponseHandler {
     }
 
     public void respondMethodNotImplemented( Resource resource, Response response, Request request ) {
-//        log.debug( "method not implemented. resource: " + resource.getClass().getName() + " - method " + request.getMethod() );
+//        Logger.debug(this, "method not implemented. resource: " + resource.getClass().getName() + " - method " + request.getMethod() );
         try {
             response.setStatus( Response.Status.SC_NOT_IMPLEMENTED );
             OutputStream out = response.getOutputStream();
             out.write( METHOD_NOT_IMPLEMENTED_HTML.getBytes() );
         } catch( IOException ex ) {
-            log.warn( "exception writing content" );
+            Logger.warning(this, "exception writing content" );
         }
     }
 
     public void respondMethodNotAllowed( Resource res, Response response, Request request ) {
-        log.debug( "method not allowed. handler: " + this.getClass().getName() + " resource: " + res.getClass().getName() );
+        Logger.debug(this, "method not allowed. handler: " + this.getClass().getName() + " resource: " + res.getClass().getName() );
         try {
             response.setStatus( Response.Status.SC_METHOD_NOT_ALLOWED );
             OutputStream out = response.getOutputStream();
             out.write( METHOD_NOT_ALLOWED_HTML.getBytes() );
         } catch( IOException ex ) {
-            log.warn( "exception writing content" );
+            Logger.warning(this, "exception writing content" );
         }
     }
 
@@ -99,13 +97,13 @@ public class DefaultHttp11ResponseHandler implements Http11ResponseHandler {
      * @param message - optional message to output in the body content
      */
     public void respondConflict( Resource resource, Response response, Request request, String message ) {
-        log.debug( "respondConflict" );
+        Logger.debug(this, "respondConflict" );
         try {
             response.setStatus( Response.Status.SC_CONFLICT );
             OutputStream out = response.getOutputStream();
             out.write( CONFLICT_HTML.getBytes() );
         } catch( IOException ex ) {
-            log.warn( "exception writing content" );
+            Logger.warning(this, "exception writing content" );
         }
     }
 
@@ -122,17 +120,17 @@ public class DefaultHttp11ResponseHandler implements Http11ResponseHandler {
     }
 
     public void respondCreated( Resource resource, Response response, Request request ) {
-//        log.debug( "respondCreated" );
+//        Logger.debug(this, "respondCreated" );
         response.setStatus( Response.Status.SC_CREATED );
     }
 
     public void respondNoContent( Resource resource, Response response, Request request ) {
-//        log.debug( "respondNoContent" );
+//        Logger.debug(this, "respondNoContent" );
         response.setStatus( Response.Status.SC_OK );
     }
 
     public void respondPartialContent( GetableResource resource, Response response, Request request, Map<String, String> params, Range range ) throws NotAuthorizedException, BadRequestException {
-        log.debug( "respondPartialContent: " + range.getStart() + " - " + range.getFinish() );
+        Logger.debug(this, "respondPartialContent: " + range.getStart() + " - " + range.getFinish() );
         response.setStatus( Response.Status.SC_PARTIAL_CONTENT );
         response.setContentRangeHeader( range.getStart(), range.getFinish(), resource.getContentLength() );
         response.setDateHeader( new Date() );
@@ -148,7 +146,7 @@ public class DefaultHttp11ResponseHandler implements Http11ResponseHandler {
         try {
             resource.sendContent( response.getOutputStream(), range, params, ct );
         } catch( IOException ex ) {
-            log.warn( "IOException writing to output, probably client terminated connection", ex );
+            Logger.warning(this, "IOException writing to output, probably client terminated connection", ex );
         }
     }
 
@@ -157,7 +155,7 @@ public class DefaultHttp11ResponseHandler implements Http11ResponseHandler {
     }
 
     public void respondContent( Resource resource, Response response, Request request, Map<String, String> params ) throws NotAuthorizedException, BadRequestException {
-//        log.debug( "respondContent: " + resource.getClass() );
+//        Logger.debug(this, "respondContent: " + resource.getClass() );
         setRespondContentCommonHeaders( response, resource );
         if( resource instanceof GetableResource ) {
             GetableResource gr = (GetableResource) resource;
@@ -176,7 +174,7 @@ public class DefaultHttp11ResponseHandler implements Http11ResponseHandler {
     }
 
     public void respondNotModified( GetableResource resource, Response response, Request request ) {
-//        log.debug( "not modified" );
+//        Logger.debug(this, "not modified" );
         response.setStatus( Response.Status.SC_NOT_MODIFIED );
         response.setDateHeader( new Date() );
         String etag = eTagGenerator.generateEtag( resource );
@@ -192,7 +190,7 @@ public class DefaultHttp11ResponseHandler implements Http11ResponseHandler {
 
     public static void setCacheControl( final GetableResource resource, final Response response, Auth auth ) {
         Long delta = resource.getMaxAgeSeconds( auth );
-//        log.debug( "setCacheControl: " + delta + " - " + resource.getClass() );
+//        Logger.debug(this, "setCacheControl: " + delta + " - " + resource.getClass() );
         if( delta != null ) {
             if( auth != null ) {
                 response.setCacheControlPrivateMaxAgeHeader( delta );
@@ -219,7 +217,7 @@ public class DefaultHttp11ResponseHandler implements Http11ResponseHandler {
             resource.sendContent( out, null, params, contentType );
             out.flush();
         } catch( IOException ex ) {
-            log.warn( "IOException sending content", ex );
+            Logger.warning(this, "IOException sending content", ex );
         }
     }
 

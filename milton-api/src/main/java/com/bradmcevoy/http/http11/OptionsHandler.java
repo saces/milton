@@ -8,8 +8,6 @@ import com.bradmcevoy.http.Request.Method;
 import com.bradmcevoy.http.exceptions.BadRequestException;
 import com.bradmcevoy.http.exceptions.ConflictException;
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Support the OPTIONS http method.
@@ -22,7 +20,6 @@ import org.slf4j.LoggerFactory;
  */
 public class OptionsHandler implements ResourceHandler {
 
-    private static final Logger log = LoggerFactory.getLogger( OptionsHandler.class );
     private final Http11ResponseHandler responseHandler;
     private final HandlerHelper handlerHelper;
     private final ResourceHandlerHelper resourceHandlerHelper;

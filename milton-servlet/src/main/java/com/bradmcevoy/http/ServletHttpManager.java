@@ -1,12 +1,10 @@
 package com.bradmcevoy.http;
 
 import com.bradmcevoy.http.webdav.WebDavResponseHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import freenet.log.Logger;
 
 public class ServletHttpManager extends HttpManager implements Initable {
-    
-    private static final Logger log = LoggerFactory.getLogger(ServletHttpManager.class);
     
     public ServletHttpManager(ResourceFactory resourceFactory, WebDavResponseHandler responseHandler, AuthenticationService authenticationService) {
         super(resourceFactory, responseHandler, authenticationService );
@@ -22,7 +20,7 @@ public class ServletHttpManager extends HttpManager implements Initable {
     }
     
     public void init(ApplicationConfig config,HttpManager manager) {
-        log.debug("init");
+        Logger.debug(this, "init");
         if( resourceFactory != null ) { 
             if( resourceFactory instanceof Initable ) {
                 Initable i = (Initable)resourceFactory;
@@ -31,7 +29,7 @@ public class ServletHttpManager extends HttpManager implements Initable {
             for( String paramName : config.getInitParameterNames() ) {
                 if( paramName.startsWith("filter_") ) {
                     String filterClass = config.getInitParameter(paramName);
-                    log.debug("init filter: " + filterClass);
+                    Logger.debug(this, "init filter: " + filterClass);
                     String[] arr = paramName.split("_");
                     String ordinal = arr[arr.length-1];
                     int pos = Integer.parseInt(ordinal);
@@ -59,7 +57,7 @@ public class ServletHttpManager extends HttpManager implements Initable {
     }
     
     public void destroy(HttpManager manager) {
-        log.debug("destroy");
+        Logger.debug(this, "destroy");
         if( resourceFactory != null ) {
             if( resourceFactory instanceof Initable ) {
                 Initable i = (Initable)resourceFactory;

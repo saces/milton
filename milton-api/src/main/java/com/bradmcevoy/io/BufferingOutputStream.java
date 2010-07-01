@@ -4,14 +4,15 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import org.apache.commons.io.output.ByteArrayOutputStream;
+
+import freenet.log.Logger;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * An output stream which will buffer data, initially using memory up to
@@ -26,8 +27,6 @@ import org.slf4j.LoggerFactory;
  * @author brad
  */
 public class BufferingOutputStream extends OutputStream{
-
-    private static Logger log = LoggerFactory.getLogger(BufferingOutputStream.class);
 
     private ByteArrayOutputStream tempMemoryBuffer = new ByteArrayOutputStream();
     private int maxMemorySize;
@@ -167,9 +166,9 @@ public class BufferingOutputStream extends OutputStream{
     @Override
     protected void finalize() throws Throwable {
         if( tempFile != null && tempFile.exists() ) {
-            log.error("temporary file was not deleted. Was close called on the inputstream? Will attempt to delete");
+            Logger.error(this, "temporary file was not deleted. Was close called on the inputstream? Will attempt to delete");
             if( !tempFile.delete()) {
-                log.error("Still couldnt delete temporary file: " + tempFile.getAbsolutePath());
+                Logger.error(this, "Still couldnt delete temporary file: " + tempFile.getAbsolutePath());
             }
         }
         super.finalize();

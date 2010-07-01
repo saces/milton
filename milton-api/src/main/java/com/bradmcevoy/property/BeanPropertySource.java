@@ -7,16 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.namespace.QName;
 import org.apache.commons.beanutils.PropertyUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author brad
  */
 public class BeanPropertySource implements PropertySource {
-
-    private static final Logger log = LoggerFactory.getLogger( BeanPropertySource.class );
 
     private static final Object[] NOARGS = new Object[0];
 

@@ -1,16 +1,14 @@
 package com.bradmcevoy.http.http11.auth;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import freenet.log.Logger;
 
 /**
  *
  * @author brad
  */
 public class DigestGenerator {
-
-    private static final Logger log = LoggerFactory.getLogger( DigestGenerator.class );
 
     /**
      * Computes the <code>response</code> portion of a Digest authentication header. Both the server and user
@@ -23,7 +21,7 @@ public class DigestGenerator {
      * @throws IllegalArgumentException if the supplied qop value is unsupported.
      */
     public String generateDigest( DigestResponse dr, String password ) throws IllegalArgumentException {
-        log.debug( "user:" + dr.getUser() + ":realm:" + dr.getRealm() + ":" + password );
+        Logger.debug(this, "user:" + dr.getUser() + ":realm:" + dr.getRealm() + ":" + password );
         String p = password == null ? "" : password;
         String a1Md5 = encodePasswordInA1Format( dr.getUser(), dr.getRealm(), p );
         return generateDigestWithEncryptedPassword( dr, a1Md5 );

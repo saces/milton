@@ -5,8 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import freenet.log.Logger;
 
 /**
  * An inputstream to read a file, and to delete the file when this stream is closed
@@ -18,8 +18,6 @@ import org.slf4j.LoggerFactory;
  * @author brad
  */
 public class FileDeletingInputStream extends InputStream{
-
-    private static Logger log = LoggerFactory.getLogger(FileDeletingInputStream.class);
 
     private File tempFile;
     private InputStream wrapped;
@@ -55,7 +53,7 @@ public class FileDeletingInputStream extends InputStream{
             wrapped.close();
         } finally {
             if(!tempFile.delete()) {
-                log.error("Failed to delete: " + tempFile.getAbsolutePath());
+                Logger.error(this, "Failed to delete: " + tempFile.getAbsolutePath());
             } else {
                 tempFile = null;
             }
@@ -65,9 +63,9 @@ public class FileDeletingInputStream extends InputStream{
     @Override
     protected void finalize() throws Throwable {
         if( tempFile != null && tempFile.exists() ) {
-            log.error("temporary file was not deleted. Was close called on the inputstream? Will attempt to delete");
+            Logger.error(this, "temporary file was not deleted. Was close called on the inputstream? Will attempt to delete");
             if( !tempFile.delete()) {
-                log.error("Still couldnt delete temporary file: " + tempFile.getAbsolutePath());
+                Logger.error(this, "Still couldnt delete temporary file: " + tempFile.getAbsolutePath());
             }
         }
         super.finalize();

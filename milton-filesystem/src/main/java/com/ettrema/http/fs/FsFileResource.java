@@ -11,6 +11,9 @@ import com.bradmcevoy.http.PropPatchableResource;
 import com.bradmcevoy.http.Range;
 import com.bradmcevoy.http.Request;
 import com.bradmcevoy.http.webdav.PropPatchHandler.Fields;
+
+import freenet.log.Logger;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -18,15 +21,11 @@ import java.io.OutputStream;
 import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
  */
 public class FsFileResource extends FsResource implements CopyableResource, DeletableResource, GetableResource, MoveableResource, PropFindableResource, PropPatchableResource {
-
-    private static final Logger log = LoggerFactory.getLogger( FsFileResource.class );
 
     /**
      *
@@ -52,7 +51,7 @@ public class FsFileResource extends FsResource implements CopyableResource, Dele
     }
 
     public void sendContent( OutputStream out, Range range, Map<String, String> params, String contentType ) throws IOException {
-        log.debug( "send content: " + file.getAbsolutePath() );
+        Logger.debug(this, "send content: " + file.getAbsolutePath() );
         FileInputStream in = null;
         try {
             in = new FileInputStream( file );
@@ -65,7 +64,7 @@ public class FsFileResource extends FsResource implements CopyableResource, Dele
             //            }
             //        } else {
             int bytes = IOUtils.copy( in, out );
-            log.debug( "wrote bytes:  " + bytes );
+            Logger.debug(this, "wrote bytes:  " + bytes );
             out.flush();
             //        }
         } finally {

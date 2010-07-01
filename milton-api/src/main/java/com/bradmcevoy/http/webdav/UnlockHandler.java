@@ -2,8 +2,6 @@
 package com.bradmcevoy.http.webdav;
 
 import com.bradmcevoy.http.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.bradmcevoy.http.Request.Method;
 import com.bradmcevoy.http.exceptions.BadRequestException;
@@ -11,9 +9,9 @@ import com.bradmcevoy.http.exceptions.ConflictException;
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 import com.bradmcevoy.http.http11.Http11ResponseHandler;
 
-public class UnlockHandler implements ExistingEntityHandler {
+import freenet.log.Logger;
 
-    private Logger log = LoggerFactory.getLogger(UnlockHandler.class);
+public class UnlockHandler implements ExistingEntityHandler {
 
     private final ResourceHandlerHelper resourceHandlerHelper;
 
@@ -51,7 +49,7 @@ public class UnlockHandler implements ExistingEntityHandler {
 //    	}
 
         
-        log.debug("unlocking token: " + sToken);
+        Logger.debug(this, "unlocking token: " + sToken);
         r.unlock(sToken);
         responseHandler.respondNoContent( resource, response, request );
     }

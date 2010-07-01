@@ -3,14 +3,14 @@ package com.bradmcevoy.http;
 import com.bradmcevoy.http.http11.Http11ResponseHandler;
 import com.bradmcevoy.http.webdav.DefaultWebDavResponseHandler;
 import com.bradmcevoy.http.webdav.WebDavResponseHandler;
+
+import freenet.log.Logger;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Milton's main class. All the servlets and stuff is just fluff, this is where stuff really starts to happen
@@ -19,8 +19,6 @@ import org.slf4j.LoggerFactory;
  * @author brad
  */
 public class HttpManager {
-
-    private static final Logger log = LoggerFactory.getLogger(HttpManager.class);
 
     public static String decodeUrl(String s) {
             return Utils.decodePath(s);
@@ -140,7 +138,7 @@ public class HttpManager {
     }
        
     public void process(Request request, Response response) {
-        log.debug(request.getMethod() + " :: " + request.getAbsoluteUrl() + " - " + request.getAbsoluteUrl());
+        Logger.debug(this, request.getMethod() + " :: " + request.getAbsoluteUrl() + " - " + request.getAbsoluteUrl());
         tlRequest.set( request );
         tlResponse.set( response );
         try {

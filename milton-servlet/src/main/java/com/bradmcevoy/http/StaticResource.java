@@ -68,7 +68,7 @@ public class StaticResource implements GetableResource {
 
     public Date getModifiedDate() {        
         Date dt = new Date(file.lastModified());
-//        log.debug("static resource modified: " + dt);
+//        Logger.debug(this, "static resource modified: " + dt);
         return dt;
     }
 

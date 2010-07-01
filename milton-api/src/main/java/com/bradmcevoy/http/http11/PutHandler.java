@@ -5,9 +5,6 @@ import com.bradmcevoy.http.exceptions.BadRequestException;
 import com.bradmcevoy.http.quota.StorageChecker.StorageErrorReason;
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.bradmcevoy.common.Path;
 import com.bradmcevoy.http.Request.Method;
 import com.bradmcevoy.http.Response.Status;
@@ -16,6 +13,9 @@ import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 import com.bradmcevoy.http.webdav.WebDavResponseHandler;
 import com.bradmcevoy.io.FileUtils;
 import com.bradmcevoy.io.RandomFileOutputStream;
+
+import freenet.log.Logger;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,8 +23,12 @@ import java.io.InputStream;
 import java.io.RandomAccessFile;
 
 public class PutHandler implements Handler {
+	private static volatile boolean logDEBUG;
 
-    private static final Logger log = LoggerFactory.getLogger( PutHandler.class );
+	static {
+		Logger.registerClass(PutHandler.class);
+	}
+
     private final Http11ResponseHandler responseHandler;
     private final HandlerHelper handlerHelper;
     private final PutHelper putHelper;
@@ -45,7 +49,7 @@ public class PutHandler implements Handler {
 
     private void checkResponseHandler() {
         if( !( responseHandler instanceof WebDavResponseHandler ) ) {
-            log.warn( "response handler is not a WebDavResponseHandler, so locking and quota checking will not be enabled" );
+            Logger.warning(this, "response handler is not a WebDavResponseHandler, so locking and quota checking will not be enabled" );
         }
     }
 
@@ -66,7 +70,7 @@ public class PutHandler implements Handler {
 
         String host = request.getHostHeader();
         String urlToCreateOrUpdate = HttpManager.decodeUrl( request.getAbsolutePath() );
-        log.debug( "process request: host: " + host + " url: " + urlToCreateOrUpdate );
+        Logger.debug(this, "process request: host: " + host + " url: " + urlToCreateOrUpdate );
 
         Path path = Path.path( urlToCreateOrUpdate );
         urlToCreateOrUpdate = path.toString();
@@ -78,7 +82,7 @@ public class PutHandler implements Handler {
         if( existingResource != null ) {
             //Make sure the parent collection is not locked by someone else
             if( handlerHelper.isLockedOut( request, existingResource ) ) {
-                log.warn( "resource is locked, but not by the current user" );
+                Logger.warning(this, "resource is locked, but not by the current user" );
                 respondLocked( request, response, existingResource );
                 return;
             }
@@ -87,7 +91,7 @@ public class PutHandler implements Handler {
                 CollectionResource parentCol = (CollectionResource) parent;
                 storageErr = handlerHelper.checkStorageOnReplace( request, parentCol, existingResource, host );
             } else {
-                log.warn( "parent exists but is not a collection resource: " + path.getParent() );
+                Logger.warning(this, "parent exists but is not a collection resource: " + path.getParent() );
             }
         } else {
             CollectionResource parentCol = putHelper.findNearestParent( manager, host, path );
@@ -150,14 +154,14 @@ public class PutHandler implements Handler {
             return;
         }
 
-        log.debug( "process: putting to: " + folder.getName() );
+        Logger.debug(this, "process: putting to: " + folder.getName() );
         try {
             Long l = putHelper.getContentLength( request );
             String ct = putHelper.findContentTypes( request, newName );
-            log.debug( "PutHandler: creating resource of type: " + ct );
+            Logger.debug(this, "PutHandler: creating resource of type: " + ct );
             folder.createNew( newName, request.getInputStream(), l, ct );
         } catch( IOException ex ) {
-            log.warn( "IOException reading input stream. Probably interrupted upload: " + ex.getMessage() );
+            Logger.warning(this, "IOException reading input stream. Probably interrupted upload: " + ex.getMessage() );
             return;
         }
         manager.getResponseHandler().respondCreated( folder, response, request );
@@ -171,14 +175,14 @@ public class PutHandler implements Handler {
             if( thisResource instanceof CollectionResource ) {
                 return (CollectionResource) thisResource;
             } else {
-                log.warn( "parent is not a collection: " + path );
+                Logger.warning(this, "parent is not a collection: " + path );
                 return null;
             }
         }
 
         CollectionResource parent = findOrCreateFolders( manager, host, path.getParent() );
         if( parent == null ) {
-            log.warn( "couldnt find parent: " + path );
+            Logger.warning(this, "couldnt find parent: " + path );
             return null;
         }
 
@@ -186,16 +190,16 @@ public class PutHandler implements Handler {
         if( r == null ) {
             if( parent instanceof MakeCollectionableResource ) {
                 MakeCollectionableResource mkcol = (MakeCollectionableResource) parent;
-                log.debug( "autocreating new folder: " + path.getName() );
+                Logger.debug(this, "autocreating new folder: " + path.getName() );
                 return mkcol.createCollection( path.getName() );
             } else {
-                log.debug( "parent folder isnt a MakeCollectionableResource: " + parent.getName() );
+                Logger.debug(this, "parent folder isnt a MakeCollectionableResource: " + parent.getName() );
                 return null;
             }
         } else if( r instanceof CollectionResource ) {
             return (CollectionResource) r;
         } else {
-            log.debug( "parent in URL is not a collection: " + r.getName() );
+            Logger.debug(this, "parent in URL is not a collection: " + r.getName() );
             return null;
         }
     }
@@ -216,13 +220,13 @@ public class PutHandler implements Handler {
         try {
             Range range = putHelper.parseContentRange(replacee, request);
             if( range != null ) {
-                log.debug("partial put: " + range);
+                Logger.debug(this, "partial put: " + range);
                 if( replacee instanceof PartialllyUpdateableResource ) {
-                    log.debug("doing partial put on a PartialllyUpdateableResource");
+                    Logger.debug(this, "doing partial put on a PartialllyUpdateableResource");
                     PartialllyUpdateableResource partialllyUpdateableResource = (PartialllyUpdateableResource) replacee;
                     partialllyUpdateableResource.replacePartialContent(range, request.getInputStream());
                 } else if( replacee instanceof GetableResource) {
-                    log.debug("doing partial put on a GetableResource");
+                    Logger.debug(this, "doing partial put on a GetableResource");
                     File tempFile = File.createTempFile("milton-partial",null );
                     RandomAccessFile randomAccessFile = null;
                     
@@ -268,18 +272,18 @@ public class PutHandler implements Handler {
                 replacee.replaceContent( request.getInputStream(), l );
             }
         } catch( IOException ex ) {
-            log.warn( "IOException reading input stream. Probably interrupted upload: " + ex.getMessage() );
+            Logger.warning(this, "IOException reading input stream. Probably interrupted upload: " + ex.getMessage() );
             return;
         }
         responseHandler.respondCreated( replacee, response, request );
 
-        log.debug( "process: finished" );
+        Logger.debug(this, "process: finished" );
     }
 
     public void processExistingResource( HttpManager manager, Request request, Response response, Resource resource ) throws NotAuthorizedException, BadRequestException, ConflictException {
         String host = request.getHostHeader();
         String urlToCreateOrUpdate = HttpManager.decodeUrl( request.getAbsolutePath() );
-        log.debug( "process request: host: " + host + " url: " + urlToCreateOrUpdate );
+        Logger.debug(this, "process request: host: " + host + " url: " + urlToCreateOrUpdate );
 
         Path path = Path.path( urlToCreateOrUpdate );
         urlToCreateOrUpdate = path.toString();
@@ -290,7 +294,7 @@ public class PutHandler implements Handler {
         if( existingResource != null ) {
             //Make sure the parent collection is not locked by someone else
             if( handlerHelper.isLockedOut( request, existingResource ) ) {
-                log.warn( "resource is locked, but not by the current user" );
+                Logger.warning(this, "resource is locked, but not by the current user" );
                 response.setStatus( Status.SC_LOCKED ); //423
                 return;
             }
@@ -310,8 +314,8 @@ public class PutHandler implements Handler {
             String nameToCreate = path.getName();
             CollectionResource folderResource = findOrCreateFolders( manager, host, path.getParent() );
             if( folderResource != null ) {
-                if( log.isDebugEnabled() ) {
-                    log.debug( "found folder: " + urlFolder + " - " + folderResource.getClass() );
+                if(logDEBUG) {
+                    Logger.debug(this, "found folder: " + urlFolder + " - " + folderResource.getClass() );
                 }
                 if( folderResource instanceof PutableResource ) {
 

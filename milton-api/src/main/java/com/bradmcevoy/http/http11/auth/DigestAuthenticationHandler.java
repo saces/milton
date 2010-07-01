@@ -5,8 +5,8 @@ import com.bradmcevoy.http.AuthenticationHandler;
 import com.bradmcevoy.http.DigestResource;
 import com.bradmcevoy.http.Request;
 import com.bradmcevoy.http.Resource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import freenet.log.Logger;
 
 /**
  *
@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
  */
 public class DigestAuthenticationHandler implements AuthenticationHandler {
 
-    private static final Logger log = LoggerFactory.getLogger( DigestAuthenticationHandler.class );
     private final NonceProvider nonceProvider;
     private final DigestHelper digestHelper;
 
@@ -35,7 +34,7 @@ public class DigestAuthenticationHandler implements AuthenticationHandler {
         if( r instanceof DigestResource ) {
             b = Auth.Scheme.DIGEST.equals( auth.getScheme() );
         } else {
-            log.debug( "resource is not an instanceof " + DigestResource.class );
+            Logger.debug(this, "resource is not an instanceof " + DigestResource.class );
             b = false;
         }
         return b;
@@ -46,7 +45,7 @@ public class DigestAuthenticationHandler implements AuthenticationHandler {
         Auth auth = request.getAuthorization();
         DigestResponse resp = digestHelper.calculateResponse(auth, r.getRealm(), request.getMethod());
         if( resp == null ) {
-            log.debug("requested digest authentication is invalid or incorrectly formatted");
+            Logger.debug(this, "requested digest authentication is invalid or incorrectly formatted");
             return null;
         } else {
             Object o = digestResource.authenticate( resp );

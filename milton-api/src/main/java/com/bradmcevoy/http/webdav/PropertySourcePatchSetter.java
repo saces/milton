@@ -6,22 +6,21 @@ import com.bradmcevoy.http.values.ValueWriters;
 import com.bradmcevoy.http.webdav.PropPatchRequestParser.ParseResult;
 import com.bradmcevoy.property.PropertySource;
 import com.bradmcevoy.property.PropertySource.PropertyMetaData;
+
+import freenet.log.Logger;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import javax.xml.namespace.QName;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author brad
  */
 public class PropertySourcePatchSetter implements PropPatchSetter{
-
-    private static final Logger log = LoggerFactory.getLogger( PropertySourcePatchSetter.class );
 
     private final List<PropertySource> propertySources;
 
@@ -54,18 +53,18 @@ public class PropertySourcePatchSetter implements PropPatchSetter{
 
 
     public List<PropFindResponse> setProperties( String href, ParseResult parseResult, Resource r ) {
-        log.debug( "setProperties: toset: " + parseResult.getFieldsToSet().size());
+        Logger.debug(this, "setProperties: toset: " + parseResult.getFieldsToSet().size());
         Map<QName, ValueAndType> knownProps = new HashMap<QName, ValueAndType>();
         List<QName> unknownProps = new ArrayList<QName>();
         PropertyMetaData meta;
 
         for( Entry<QName, String> entry : parseResult.getFieldsToSet().entrySet()) {
-            log.debug( "setting: " + entry.getKey().getLocalPart());
+            Logger.debug(this, "setting: " + entry.getKey().getLocalPart());
             boolean found = false;
             for(PropertySource source : propertySources ) {
                 meta = source.getPropertyMetaData( entry.getKey(), r );
                 if( meta != null && meta.isWritable() ) {
-                    log.debug( "setting: " + entry.getKey().getLocalPart() + " to: " + entry.getValue());
+                    Logger.debug(this, "setting: " + entry.getKey().getLocalPart() + " to: " + entry.getValue());
                     found = true;
                     Object val = parse(entry.getKey(), entry.getValue(), meta.getValueType());
                     source.setProperty( entry.getKey(), val, r);

@@ -1,9 +1,10 @@
 package com.bradmcevoy.http;
 
 import com.bradmcevoy.common.ContentTypeUtils;
+
+import freenet.log.Logger;
+
 import java.io.File;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This can either be initialised with the old servlet/ApplicationConfig/Initable
@@ -17,7 +18,6 @@ import org.slf4j.LoggerFactory;
  */
 public class StaticResourceFactory implements ResourceFactory, Initable {
 
-    private static final Logger log = LoggerFactory.getLogger( StaticResourceFactory.class );
     /**
      * either this or root will be set
      */
@@ -38,7 +38,7 @@ public class StaticResourceFactory implements ResourceFactory, Initable {
     public StaticResourceFactory( String context, File root ) {
         this.root = root;
         this.contextPath = context;
-        log.debug( "root: " + root.getAbsolutePath() + " - context:" + context );
+        Logger.debug(this, "root: " + root.getAbsolutePath() + " - context:" + context );
     }
 
     public void init( ApplicationConfig config, HttpManager manager ) {
@@ -49,9 +49,9 @@ public class StaticResourceFactory implements ResourceFactory, Initable {
         File file;
         if( root != null ) {
             // strip the context
-            log.debug( "url: " + url );
+            Logger.debug(this, "url: " + url );
             String s = stripContext( url );
-            log.debug( "url: " + s );
+            Logger.debug(this, "url: " + s );
             file = new File( root, s );
         } else {
             if( config == null )
@@ -80,7 +80,7 @@ public class StaticResourceFactory implements ResourceFactory, Initable {
     private String stripContext( String url ) {
         if( this.contextPath != null && contextPath.length() > 0 ) {
             url = url.replaceFirst( '/' + contextPath, "" );
-            log.debug( "stripped context: " + url );
+            Logger.debug(this, "stripped context: " + url );
             return url;
         } else {
             return url;

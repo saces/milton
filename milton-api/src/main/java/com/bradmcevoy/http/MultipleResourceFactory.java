@@ -3,14 +3,10 @@ package com.bradmcevoy.http;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import freenet.log.Logger;
 
 public class MultipleResourceFactory implements ResourceFactory {
-    
-    private Logger log = LoggerFactory.getLogger(MultipleResourceFactory.class);
 
-    
     protected final List<ResourceFactory> factories;
 
     public MultipleResourceFactory() {
@@ -23,14 +19,14 @@ public class MultipleResourceFactory implements ResourceFactory {
         
 
     public Resource getResource(String host, String url) {
-        log.debug( "getResource: " + url);
+        Logger.debug(this, "getResource: " + url);
         for( ResourceFactory rf : factories ) {
             Resource r = rf.getResource(host,url);
             if( r != null ) {
                 return r;
             }
         }
-        log.debug("no resource factory supplied a resouce");
+        Logger.debug(this, "no resource factory supplied a resouce");
         return null;
     }  
 }

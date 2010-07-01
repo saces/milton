@@ -8,12 +8,10 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import com.bradmcevoy.http.LockInfo.LockScope;
 import com.bradmcevoy.http.LockInfo.LockType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import freenet.log.Logger;
 
 public class LockInfoSaxHandler extends DefaultHandler {
-
-    private static final Logger log = LoggerFactory.getLogger( LockInfo.class );
 
     private LockInfo info = new LockInfo();
     private StringBuilder owner;
@@ -39,7 +37,7 @@ public class LockInfoSaxHandler extends DefaultHandler {
     public void endElement( String uri, String localName, String name ) throws SAXException {
         elementPath.pop();
         if( localName.equals( "owner" ) ) {
-            log.debug( "owner: " + owner.toString());
+            Logger.debug(this, "owner: " + owner.toString());
             getInfo().owner = owner.toString();
         }
         if( elementPath.size() > 1 ) {

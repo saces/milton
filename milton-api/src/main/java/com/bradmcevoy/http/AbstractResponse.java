@@ -4,19 +4,17 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import freenet.log.Logger;
 
 public abstract class AbstractResponse implements Response {
 
-    private static final Logger log = LoggerFactory.getLogger(AbstractResponse.class);
     protected Long contentLength;
 
     public AbstractResponse() {
     }
 
     public void setResponseHeader(Response.Header header, String value) {
-        //log.debug("setResponseHeader: " + header.code + " - " + value);
+        //Logger.debug(this, "setResponseHeader: " + header.code + " - " + value);
         setNonStandardHeader(header.code, value);
     }
 
@@ -147,7 +145,7 @@ public abstract class AbstractResponse implements Response {
         try {
             this.getOutputStream().write(s.getBytes());
         } catch (IOException ex) {
-            log.warn("Exception writing to output. Probably client closed connection", ex);
+            Logger.warning(this, "Exception writing to output. Probably client closed connection", ex);
         }
     }
 

@@ -11,8 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.xml.namespace.QName;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -20,7 +18,6 @@ import org.slf4j.LoggerFactory;
  */
 public class PropFindXmlGenerator {
 
-    private static final Logger log = LoggerFactory.getLogger( PropFindXmlGenerator.class );
     private final Helper helper;
     private final ValueWriters valueWriters;
 
@@ -90,7 +87,7 @@ public class PropFindXmlGenerator {
         }
 
         void appendResponses( XmlWriter writer, List<PropFindResponse> propFindResponses, Map<String, String> mapOfNamespaces ) {
-//            log.debug( "appendResponses: " + propFindResponses.size() );
+//            Logger.debug(this, "appendResponses: " + propFindResponses.size() );
             for( PropFindResponse r : propFindResponses ) {
                 XmlWriter.Element el = writer.begin( "D:response" );
                 el.open();
@@ -102,7 +99,7 @@ public class PropFindXmlGenerator {
         }
 
         private void sendKnownProperties( XmlWriter writer, Map<String, String> mapOfNamespaces, Map<QName, ValueAndType> properties, String href ) {
-//            log.debug( "sendKnownProperties: " + properties.size() );
+//            Logger.debug(this, "sendKnownProperties: " + properties.size() );
             if( !properties.isEmpty() ) {
                 XmlWriter.Element elPropStat = writer.begin( "D:propstat" ).open();
                 XmlWriter.Element elProp = writer.begin( "D:prop" ).open();
@@ -118,7 +115,7 @@ public class PropFindXmlGenerator {
         }
 
         private void sendUnknownProperties( XmlWriter writer, Map<String, String> mapOfNamespaces, List<QName> properties ) {
-//            log.debug( "sendUnknownProperties: " + properties.size() );
+//            Logger.debug(this, "sendUnknownProperties: " + properties.size() );
             if( !properties.isEmpty() ) {
                 XmlWriter.Element elPropStat = writer.begin( "D:propstat" ).open();
                 XmlWriter.Element elProp = writer.begin( "D:prop" ).open();

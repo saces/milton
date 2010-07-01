@@ -5,11 +5,12 @@ import com.bradmcevoy.http.exceptions.BadRequestException;
 import com.bradmcevoy.http.exceptions.ConflictException;
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 import com.bradmcevoy.http.http11.Http11ResponseHandler;
+
+import freenet.log.Logger;
+
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -17,7 +18,6 @@ import org.slf4j.LoggerFactory;
  */
 public class ResourceHandlerHelper {
 
-    private Logger log = LoggerFactory.getLogger( ResourceHandlerHelper.class );
     private final HandlerHelper handlerHelper;
     private final Http11ResponseHandler responseHandler;
 
@@ -37,7 +37,7 @@ public class ResourceHandlerHelper {
         try {
             request.parseRequestParameters( params, files );
         } catch( RequestParseException ex ) {
-            log.warn( "exception parsing request. probably interrupted upload", ex );
+            Logger.warning(this, "exception parsing request. probably interrupted upload", ex );
             return;
         }
         request.getAttributes().put( "_params", params);
@@ -48,7 +48,7 @@ public class ResourceHandlerHelper {
         }
         String host = request.getHostHeader();
         String url = HttpManager.decodeUrl( request.getAbsolutePath() );
-        //log.debug( "find resource: path: " + url + " host: " + host );
+        //Logger.debug(this, "find resource: path: " + url + " host: " + host );
         Resource r = manager.getResourceFactory().getResource( host, url );
         if( r == null ) {
             responseHandler.respondNotFound( response, request );
@@ -80,7 +80,7 @@ public class ResourceHandlerHelper {
 
 
             if( handlerHelper.isNotCompatible( resource, request.getMethod()) || !handler.isCompatible( resource ) ) {
-                log.debug( "resource not compatible. Resource class: " + resource.getClass() + " handler: " + handler.getClass() );
+                Logger.debug(this, "resource not compatible. Resource class: " + resource.getClass() + " handler: " + handler.getClass() );
                 responseHandler.respondMethodNotImplemented( resource, response, request );
                 return;
             }

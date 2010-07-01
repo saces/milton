@@ -7,6 +7,9 @@ import com.bradmcevoy.http.Utils;
 import com.bradmcevoy.http.values.ValueAndType;
 import com.bradmcevoy.property.PropertySource;
 import com.bradmcevoy.property.PropertySource.PropertyMetaData;
+
+import freenet.log.Logger;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -16,8 +19,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import javax.xml.namespace.QName;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class performs the main part of PROPFIND processing, which is given
@@ -36,7 +37,6 @@ import org.slf4j.LoggerFactory;
  */
 public class PropFindPropertyBuilder {
 
-    private static final Logger log = LoggerFactory.getLogger(PropFindPropertyBuilder.class);
     private final List<PropertySource> propertySources;
 
     /**
@@ -46,7 +46,7 @@ public class PropFindPropertyBuilder {
      */
     public PropFindPropertyBuilder(List<PropertySource> propertySources) {
         this.propertySources = propertySources;
-        log.debug("num property sources: " + propertySources.size());
+        Logger.debug(this, "num property sources: " + propertySources.size());
     }
 
     /**
@@ -67,7 +67,7 @@ public class PropFindPropertyBuilder {
     }
 
     public ValueAndType getProperty(QName field, Resource resource) {
-        log.debug("num property sources: " + propertySources.size());
+        Logger.debug(this, "num property sources: " + propertySources.size());
         for (PropertySource source : propertySources) {
             PropertyMetaData meta = source.getPropertyMetaData(field, resource);
             if (meta != null && !meta.isUnknown()) {
@@ -124,22 +124,22 @@ public class PropFindPropertyBuilder {
                     }
                 }
                 if (!found) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("unknown: " + field.toString());
-                    }
+                    //if (log.isDebugEnabled()) {
+                        Logger.debug(this, "unknown: " + field.toString());
+                    //}
                     unknownProperties.add(field);
                 }
 
             }
         }
-        if (log.isDebugEnabled()) {
+        //if (log.isDebugEnabled()) {
             if (unknownProperties.size() > 0) {
-                log.debug("some properties could not be resolved. Listing property sources:");
+                Logger.debug(this, "some properties could not be resolved. Listing property sources:");
                 for (PropertySource ps : propertySources) {
-                    log.debug(" - " + ps.getClass().getCanonicalName());
+                    Logger.debug(this, " - " + ps.getClass().getCanonicalName());
                 }
             }
-        }
+        //}
 
         PropFindResponse r = new PropFindResponse(href, knownProperties, unknownProperties);
         responses.add(r);
@@ -152,7 +152,7 @@ public class PropFindPropertyBuilder {
                 if (child instanceof PropFindableResource) {
                     String childName = child.getName();
                     if (childName == null) {
-                        log.warn("null name for resource of type: " + child.getClass() + " in folder: " + href + " WILL NOT be returned in PROPFIND response!!");
+                        Logger.warning(this, "null name for resource of type: " + child.getClass() + " in folder: " + href + " WILL NOT be returned in PROPFIND response!!");
                     } else {
                         String childHref = collectionHref + Utils.percentEncode(childName);
                         // Note that the new collection href, is just the current href

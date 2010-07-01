@@ -5,18 +5,16 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import freenet.log.Logger;
 
 public class LockTimeout {
 
-    private static Logger log = LoggerFactory.getLogger(LockTimeout.class);
     private static final String INFINITE = "Infinite";
     
             
     public static LockTimeout parseTimeout(Request request) {
         String sTimeout = request.getTimeoutHeader();
-        log.debug("..requested timeout: " + sTimeout);
+        Logger.debug(LockTimeout.class, "..requested timeout: " + sTimeout);
         return parseTimeout(sTimeout);
     }
     
@@ -63,7 +61,7 @@ public class LockTimeout {
             l = Long.parseLong(s);
             return l;
         } catch (NumberFormatException numberFormatException) {
-            log.error("Number format exception parsing timeout: " + s);
+            Logger.error(LockTimeout.class, "Number format exception parsing timeout: " + s);
             return null;
         }        
     }

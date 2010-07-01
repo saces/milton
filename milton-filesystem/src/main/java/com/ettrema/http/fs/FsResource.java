@@ -15,16 +15,16 @@ import com.bradmcevoy.http.Request.Method;
 import com.bradmcevoy.http.Resource;
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 import com.bradmcevoy.http.http11.auth.DigestResponse;
+
+import freenet.log.Logger;
+
 import java.io.File;
 import java.util.Date;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
  */
 public abstract class FsResource implements Resource, MoveableResource, CopyableResource, LockableResource, DigestResource {
-    private static final Logger log = LoggerFactory.getLogger(FsResource.class);
 
     File file;
     final FileSystemResourceFactory factory;
@@ -123,7 +123,7 @@ public abstract class FsResource implements Resource, MoveableResource, Copyable
         if( factory.getLockManager() != null ) {
             return factory.getLockManager().getCurrentToken( this );
         } else {
-            log.warn("getCurrentLock called, but no lock manager: file: " + file.getAbsolutePath());
+            Logger.warning(this, "getCurrentLock called, but no lock manager: file: " + file.getAbsolutePath());
             return null;
         }
     }

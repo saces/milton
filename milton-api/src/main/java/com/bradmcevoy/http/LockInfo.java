@@ -4,16 +4,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-public class LockInfo {
+import freenet.log.Logger;
 
-    private static final Logger log = LoggerFactory.getLogger( LockInfo.class );
+public class LockInfo {
 
     public enum LockScope {
 
@@ -48,9 +46,9 @@ public class LockInfo {
             info.lockedByUser = request.getAuthorization().getUser();
         }
         if( info.lockedByUser == null ) {
-            log.warn( "resource is being locked with a null user. This won't really be locked at all..." );
+            Logger.warning(LockInfo.class, "resource is being locked with a null user. This won't really be locked at all..." );
         }
-        log.debug( "parsed lock info: " + info );
+        Logger.debug(LockInfo.class, "parsed lock info: " + info );
         return info;
 
     }

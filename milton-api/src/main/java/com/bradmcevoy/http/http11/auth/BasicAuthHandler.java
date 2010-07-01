@@ -5,8 +5,8 @@ import com.bradmcevoy.http.Auth.Scheme;
 import com.bradmcevoy.http.AuthenticationHandler;
 import com.bradmcevoy.http.Request;
 import com.bradmcevoy.http.Resource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import freenet.log.Logger;
 
 /**
  *
@@ -14,19 +14,17 @@ import org.slf4j.LoggerFactory;
  */
 public class BasicAuthHandler implements AuthenticationHandler {
 
-    private static final Logger log = LoggerFactory.getLogger( BasicAuthHandler.class );
-
     public boolean supports( Resource r, Request request ) {
         Auth auth = request.getAuthorization();
-        log.debug( "supports: " + auth.getScheme() );
+        Logger.debug(this, "supports: " + auth.getScheme() );
         return auth.getScheme().equals( Scheme.BASIC );
     }
 
     public Object authenticate( Resource resource, Request request ) {
-        log.debug( "authenticate" );
+        Logger.debug(this, "authenticate" );
         Auth auth = request.getAuthorization();
         Object o = resource.authenticate( auth.getUser(), auth.getPassword() );
-        log.debug( "result: " + o);
+        Logger.debug(this, "result: " + o);
         return o;
     }
 

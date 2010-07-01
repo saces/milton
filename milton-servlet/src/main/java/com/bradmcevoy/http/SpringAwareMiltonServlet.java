@@ -92,7 +92,7 @@ public class SpringAwareMiltonServlet implements Servlet{
             context = new ClassPathXmlApplicationContext(new String[] {"applicationContext.xml"});
             httpManager = (HttpManager) context.getBean("milton.http.manager");
         } catch (Throwable ex) {
-            log.error("Exception starting milton servlet",ex);
+            Logger.error(this, "Exception starting milton servlet",ex);
             throw new RuntimeException(ex);
         }        
     }
