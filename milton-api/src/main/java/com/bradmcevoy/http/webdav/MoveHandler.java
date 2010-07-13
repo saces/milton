@@ -31,7 +31,6 @@ public class MoveHandler implements ExistingEntityHandler {
         return new String[]{Method.MOVE.code};
     }
         
-    @Override
     public boolean isCompatible(Resource handler) {
         return (handler instanceof MoveableResource);
     }        

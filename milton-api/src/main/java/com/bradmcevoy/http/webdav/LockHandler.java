@@ -50,7 +50,6 @@ public class LockHandler implements ResourceHandler {
         return new String[]{Method.LOCK.code};
     }
 
-    @Override
     public void process( HttpManager manager, Request request, Response response ) throws NotAuthorizedException {
         if( !handlerHelper.checkExpects( responseHandler, request, response ) ) {
             return;
@@ -174,7 +173,6 @@ public class LockHandler implements ResourceHandler {
         }
     }
 
-    @Override
     public boolean isCompatible( Resource handler ) {
         return handler instanceof LockableResource;
     }

@@ -23,17 +23,14 @@ public class PostHandler implements ExistingEntityHandler {
         this.resourceHandlerHelper = new ResourceHandlerHelper( handlerHelper, responseHandler );
     }
 
-    @Override
     public String[] getMethods() {
         return new String[]{Request.Method.POST.code};
     }
 
-    @Override
     public boolean isCompatible( Resource handler ) {
         return ( handler instanceof PostableResource );
     }
 
-    @Override
     public void process( HttpManager manager, Request request, Response response ) throws NotAuthorizedException, ConflictException, BadRequestException {
         // need a linked hash map to preserve ordering of params
         Map<String, String> params = new LinkedHashMap<String, String>();
@@ -51,13 +48,11 @@ public class PostHandler implements ExistingEntityHandler {
         this.resourceHandlerHelper.process( manager, request, response, this );
     }
 
-    @Override
     public void processResource( HttpManager manager, Request request, Response response, Resource r ) throws NotAuthorizedException, ConflictException, BadRequestException {
         manager.onPost( request, response, r, request.getParams(), request.getFiles() );
         resourceHandlerHelper.processResource( manager, request, response, r, this, true, request.getParams(), request.getFiles() );
     }
 
-    @Override
     public void processExistingResource( HttpManager manager, Request request, Response response, Resource resource ) throws NotAuthorizedException, BadRequestException {
         PostableResource r = (PostableResource) resource;
         String url = r.processForm( request.getParams(), request.getFiles() );

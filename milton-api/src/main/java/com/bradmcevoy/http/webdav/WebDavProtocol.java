@@ -381,7 +381,6 @@ public class WebDavProtocol implements HttpExtension, PropertySource {
 
     class MSIsCollectionPropertyWriter implements StandardProperty<Boolean> {
 
-        @Override
         public String fieldName() {
             return "iscollection";
         }
@@ -397,7 +396,6 @@ public class WebDavProtocol implements HttpExtension, PropertySource {
 
     class MSIsReadOnlyPropertyWriter implements StandardProperty<Boolean> {
 
-        @Override
         public String fieldName() {
             return "isreadonly";
         }
@@ -414,7 +412,6 @@ public class WebDavProtocol implements HttpExtension, PropertySource {
 
     class PrincipalCollectionSetPropertyWriter implements StandardProperty<PrincipalCollectionSetList> {
 
-        @Override
         public String fieldName() {
             return "principal-collection-set";
         }
