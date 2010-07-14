@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<!-- ant build file for milton -->
+
+<project name="milton" default="dist" basedir=".">
+	<property name="source-version" value="1.5"/>
+	<property name="target-version" value="1.5"/>
+	<property name="build" location="build/"/>
+	<property name="dist" location="dist/"/>
+	<property name="src.contrib" location="src/"/>
+	<property name="src.milton.api" location="milton-api/src/main/java/"/>
+	<property name="src.milton.servlet" location="milton-servlet/src/main/java/"/>
+	<property name="src.milton.fs" location="milton-filesystem/src/main/java/"/>
+
+	<property name="servletapi.jar.location" location="../concierge/bundles/http/dist/concierge-http.jar"/>
+
+	<target name="mkdir">
+		<mkdir dir="${build}"/>
+		<mkdir dir="${dist}"/>
+	</target>
+
+	<!-- ================================================== -->
+	<target name="compile" depends="mkdir" >
+
+		<javac srcdir="${src.contrib}" destdir="${build}" debug="on" optimize="on" source="${source-version}" target="${target-version}">
+			<include name="**/*.java"/>
+			<exclude name="**/*Test.java"/>
+			<exclude name="org/jdom/xpath/JaxenXPath.java"/>
+		</javac>
+
+		<javac srcdir="${src.milton.api}" destdir="${build}" debug="on" optimize="on" source="${source-version}" target="${target-version}">
+			<include name="**/*.java"/>
+			<exclude name="**/*Test.java"/>
+		</javac>
+
+		<javac srcdir="${src.milton.servlet}" destdir="${build}" debug="on" optimize="on" source="${source-version}" target="${target-version}">
+			<classpath>
+				<pathelement location="${servletapi.jar.location}"/>
+			</classpath>
+			<include name="**/*.java"/>
+			<exclude name="com/bradmcevoy/http/DavEnabledDispatcherServlet.java"/>
+			<exclude name="com/bradmcevoy/http/MiltonController.java"/>
+			<exclude name="com/bradmcevoy/http/SpringAwareMiltonServlet.java"/>
+			<exclude name="com/bradmcevoy/http/SpringResourceFactoryFactory.java"/>
+			<exclude name="**/*Test.java"/>
+		</javac>
+
+		<javac srcdir="${src.milton.fs}" destdir="${build}" debug="on" optimize="on" source="${source-version}" target="${target-version}">
+			<include name="**/*.java"/>
+			<exclude name="**/*Test.java"/>
+		</javac>
+
+	</target>
+
+	<!-- ================================================== -->
+
+	<target name="unit-build" depends="compile" if="junit.present" unless="skip_tests">
+		<javac srcdir="src/" destdir="${build-test}" debug="on" optimize="on" source="1.5">
+			<classpath>
+				<pathelement path="${build}"/>
+				<pathelement location="${freenet-ext.location}"/>
+				<pathelement location="${freenet-cvs-snapshot.location}"/>
+				<pathelement location="${junit.location}"/>
+			</classpath>
+			<compilerarg value="-Xlint"/>
+			<include name="**/*Test.java"/>
+		</javac>
+	</target>
+
+	<target name="junit" depends="unit-build" if="junit.present" unless="skip_tests">
+		<junit printsummary="yes" fork="yes" haltonfailure="yes">
+			<classpath>
+				<pathelement path="${build}"/>
+				<pathelement path="${build-test}"/>
+				<pathelement location="${freenet-ext.location}"/>
+				<pathelement location="${freenet-cvs-snapshot.location}"/>
+				<pathelement location="${junit.location}"/>
+			</classpath>
+
+			<formatter type="plain" usefile="false"/>
+
+			<batchtest fork="yes">
+				<fileset dir="${build-test}">
+					<include name="**/*Test.class"/>
+				</fileset>
+			</batchtest>
+			<sysproperty key="benchmark" value="${benchmark}" />
+			<sysproperty key="extensiveTesting" value="${extensiveTesting}" />
+		</junit>
+	</target>
+
+	<!-- ================================================== -->
+	<target name="dist" depends="compile"
+		description="generate the distribution" >
+		<jar jarfile="${dist}/milton.jar" duplicate="fail">
+			<manifest>
+				<attribute name="Bundle-ManifestVersion" value="1" />
+				<attribute name="Bundle-Name" value="milton" />
+				<attribute name="Bundle-SymbolicName" value="org.foo.example.Example" />
+				<attribute name="Bundle-Version" value="0.0.1" />
+				<attribute name="Export-Package" value="com.bradmcevoy.http" />
+				<attribute name="Import-Package" value="javax.servlet, javax.servlet.http"/>
+			</manifest>
+			<fileset dir="${build}/"/>
+		</jar>
+	</target>
+
+	<!-- ================================================== -->
+	<target name="clean" description="Delete class files and docs dir.">
+		<delete dir="${build}"/>
+		<delete dir="${dist}"/>
+	</target>
+</project>
