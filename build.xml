@@ -12,6 +12,9 @@
 	<property name="src.milton.fs" location="milton-filesystem/src/main/java/"/>
 
 	<property name="servletapi.jar.location" location="../concierge/bundles/http/dist/concierge-http.jar"/>
+	<property name="mimeutil.jar.location" location="../MimeUtil/dist/MimeUtil.jar"/>
+		
+	<property name="FreenetLogger.jar.location" location="../foe/FreenetLogger/dist/FreenetLogger.jar"/>
 
 	<target name="mkdir">
 		<mkdir dir="${build}"/>
@@ -22,12 +25,19 @@
 	<target name="compile" depends="mkdir" >
 
 		<javac srcdir="${src.contrib}" destdir="${build}" debug="on" optimize="on" source="${source-version}" target="${target-version}">
+			<classpath>
+				<pathelement location="${servletapi.jar.location}"/>
+			</classpath>
 			<include name="**/*.java"/>
 			<exclude name="**/*Test.java"/>
 			<exclude name="org/jdom/xpath/JaxenXPath.java"/>
 		</javac>
 
 		<javac srcdir="${src.milton.api}" destdir="${build}" debug="on" optimize="on" source="${source-version}" target="${target-version}">
+			<classpath>
+				<pathelement location="${FreenetLogger.jar.location}"/>
+				<pathelement location="${mimeutil.jar.location}"/>
+			</classpath>
 			<include name="**/*.java"/>
 			<exclude name="**/*Test.java"/>
 		</javac>
@@ -35,6 +45,8 @@
 		<javac srcdir="${src.milton.servlet}" destdir="${build}" debug="on" optimize="on" source="${source-version}" target="${target-version}">
 			<classpath>
 				<pathelement location="${servletapi.jar.location}"/>
+				<pathelement location="${FreenetLogger.jar.location}"/>
+				<pathelement location="${mimeutil.jar.location}"/>
 			</classpath>
 			<include name="**/*.java"/>
 			<exclude name="com/bradmcevoy/http/DavEnabledDispatcherServlet.java"/>
@@ -45,6 +57,9 @@
 		</javac>
 
 		<javac srcdir="${src.milton.fs}" destdir="${build}" debug="on" optimize="on" source="${source-version}" target="${target-version}">
+			<classpath>
+				<pathelement location="${FreenetLogger.jar.location}"/>
+			</classpath>
 			<include name="**/*.java"/>
 			<exclude name="**/*Test.java"/>
 		</javac>
@@ -52,7 +67,6 @@
 	</target>
 
 	<!-- ================================================== -->
-
 	<target name="unit-build" depends="compile" if="junit.present" unless="skip_tests">
 		<javac srcdir="src/" destdir="${build-test}" debug="on" optimize="on" source="1.5">
 			<classpath>
