@@ -11,7 +11,7 @@
 	<property name="src.milton.servlet" location="milton-servlet/src/main/java/"/>
 	<property name="src.milton.fs" location="milton-filesystem/src/main/java/"/>
 
-	<property name="servletapi.jar.location" location="../concierge/bundles/http/dist/concierge-http.jar"/>
+	<property name="servletapi.jar.location" location="../servlet-api-2.5/dist/servlet-api-2.5.jar"/>
 	<property name="mimeutil.jar.location" location="../MimeUtil/dist/MimeUtil.jar"/>
 		
 	<property name="FreenetLogger.jar.location" location="../foe/FreenetLogger/dist/FreenetLogger.jar"/>
